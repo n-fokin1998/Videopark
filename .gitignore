@@ -19,3 +19,16 @@ pnpm-debug.log*
 
 # macOS-specific files
 .DS_Store
+
+# media masters — kept by the owner outside git (docs/decisions.md D-010)
+content/**/*.flac
+content/**/*.wav
+content/**/*.aif
+content/**/*.aiff
+content/**/*.mp4
+content/**/*.mov
+content/**/*.webm
+
+# generated media (pnpm media)
+public/media/
+.media-cache/
