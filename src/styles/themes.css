@@ -1,0 +1,75 @@
+/*
+ * Semantic tokens per time-of-day theme (docs/design.md §2, §8). `data-theme` on <html>.
+ * Evening is the default (SSR, no-JS, link previews), so it also applies to :root.
+ * Contrast of every pair below is unit-tested in src/lib/color.test.ts — keep values as hex or var(--c-*).
+ */
+@layer tokens {
+  :root,
+  [data-theme='evening'] {
+    color-scheme: dark;
+    --bg: var(--c-dusk);
+    --bg-raised: #222c3f;
+    --fg: var(--c-paper);
+    --fg-muted: #aab3c3;
+    --accent: var(--c-lamp);
+    --line: #d0574f;
+    --focus: var(--c-lamp);
+    --link: #9cb8cc;
+    --border: #3a4867;
+    --paper: var(--c-paper);
+    --on-paper: var(--c-ink);
+    --sky-top: var(--c-twilight);
+    --sky-bottom: var(--c-dusk);
+  }
+
+  [data-theme='night'] {
+    color-scheme: dark;
+    --bg: var(--c-night);
+    --bg-raised: #161b24;
+    --fg: #ddd7cb;
+    --fg-muted: #9aa3b3;
+    --accent: var(--c-lamp);
+    --line: #c94e46;
+    --focus: var(--c-lamp);
+    --link: #8fadc2;
+    --border: #2a3245;
+    --paper: #d9d2c4;
+    --on-paper: var(--c-ink);
+    --sky-top: #141a26;
+    --sky-bottom: var(--c-night);
+  }
+
+  [data-theme='dawn'] {
+    color-scheme: light;
+    --bg: #efe8e6;
+    --bg-raised: #f7f2f0;
+    --fg: var(--c-ink);
+    --fg-muted: #4f5568;
+    --accent: #95560f;
+    --line: #a8352e;
+    --focus: #95560f;
+    --link: #2d5878;
+    --border: #c9c0c4;
+    --paper: #f7f2ea;
+    --on-paper: var(--c-ink);
+    --sky-top: #c9d3e6;
+    --sky-bottom: #efe8e6;
+  }
+
+  [data-theme='day'] {
+    color-scheme: light;
+    --bg: #e6e4df;
+    --bg-raised: #f0eeea;
+    --fg: #1f2328;
+    --fg-muted: #4c525c;
+    --accent: #8a5410;
+    --line: #a8352e;
+    --focus: #8a5410;
+    --link: #2b5571;
+    --border: #c3c0b9;
+    --paper: #f4efe5;
+    --on-paper: var(--c-ink);
+    --sky-top: #d3d6da;
+    --sky-bottom: #e6e4df;
+  }
+}

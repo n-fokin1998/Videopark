@@ -134,3 +134,23 @@ Format: `## D-NNN — Title` · Status (Proposed / Accepted / Superseded by D-xx
 - **Status:** Accepted · 2026-10-10
 - **Decision:** Concerts and rehearsals known from the uploaded YouTube list become timeline events (`kind: concert | rehearsal`) citing the video
   as source; songs known only from these videos become song entries without recordings.
+
+## D-024 — Phase 0 toolchain and scaffolding choices
+- **Status:** Accepted · 2026-10-10
+- **Context:** Scaffolding the project (roadmap phase 0) with the latest stable tools while keeping the toolchain consistent.
+- **Decision:**
+  - **Node 24 LTS** (`.nvmrc`, `engines`), **pnpm 11** (`packageManager`), **Astro 7**, **Svelte 5**, **Vitest 5**, **Playwright**, **ESLint 10** (flat config).
+  - **TypeScript 6.0**, not 7: `typescript-eslint` and `@astrojs/check` do not support TS 7 yet. Revisit when they do.
+  - `eslint-plugin-jsx-a11y-x` (ESLint 10-compatible fork) backs `eslint-plugin-astro`'s a11y rules; the peer warning of the
+    auto-installed original is silenced in `pnpm-workspace.yaml`.
+  - `build.format: 'file'` + `trailingSlash: 'never'` → `/music` is served from `music.html`; canonical URLs are extensionless.
+  - `site` defaults to `http://localhost:4321` until the domain is chosen (D-018); override with `SITE_URL`.
+  - Fonts: Fontsource npm packages imported in CSS (no Astro Fonts API — it fetches at build time, builds must be offline).
+    Only Golos + Literata cyrillic files are preloaded (≈ 50 KB).
+  - Local quality gate: `pnpm verify` (`scripts/verify.mjs`) = lint → check → unit → build → Playwright + axe → Lighthouse
+    (`@lhci/cli`, reports written to `.lighthouseci/`, never uploaded). `E2E_SKIP_FIREFOX=1` drops the Firefox project on machines
+    where Playwright's Firefox cannot start.
+  - Future locale routes: `src/pages/[locale]/…` with `getStaticPaths()` over `enabledLocales` minus `ru`; Russian pages stay unprefixed
+    files in `src/pages/`. Station pages are thin wrappers around `StationLayout`, so a localized route is a few lines.
+- **Consequences:** Upgrading to TypeScript 7 is a separate, deliberate change. Breakpoint tokens live in `tokens.css` as reference values;
+  media queries repeat the numbers (custom properties cannot be used in `@media`), and components prefer container queries.

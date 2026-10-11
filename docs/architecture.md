@@ -87,11 +87,14 @@ Any addition to this list requires a [decisions.md](decisions.md) entry.
 │  ├─ scripts/                    # small client entry scripts (non-island behaviour)
 │  └─ styles/                     # tokens.css, themes.css, global.css, typography.css, motion.css
 ├─ scripts/                       # node/tsx build-time scripts
+│  ├─ verify.mjs                  # local quality gate (pnpm verify)
 │  ├─ media-encode.ts             # FLAC → AAC .m4a 160k, peaks json, EXIF strip, video posters
 │  ├─ soundcloud-oembed.ts        # optional link check for SoundCloud fallbacks
 │  └─ validate-content.ts         # cross-reference & rights checks beyond Zod
 ├─ public/
-└─ tests/ (e2e)                   # unit tests colocated as *.test.ts
+├─ lighthouserc.cjs               # Lighthouse budgets (pnpm lighthouse)
+├─ playwright.config.ts           # e2e projects: desktop Chromium/Firefox/WebKit, mobile 360×740 / 390×844 / landscape
+└─ tests/e2e/                     # Playwright + axe; unit tests colocated as *.test.ts
 ```
 
 `src/lib/stations.ts` is the **single registry** of stations (id, route, order, i18n key, theme hints). Line indicator, line map,

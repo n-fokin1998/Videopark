@@ -1,0 +1,51 @@
+---
+/**
+ * Station sign (docs/design.md §5): the station name plate used as the hero of every station —
+ * Golos, generous tracking, the red line stripe on the left, an optional small label above.
+ * The <h1> receives focus after a ClientRouter navigation (see src/scripts/navigation.ts).
+ */
+interface Props {
+  name: string;
+  /** Small tracked label above the name, like «Станция» above a station plate. */
+  label?: string | undefined;
+}
+
+const { name, label } = Astro.props;
+---
+
+<header class="sign">
+  {label && <p class="sign__label">{label}</p>}
+  <h1 class="sign__name" tabindex="-1">
+    {name}
+  </h1>
+  <slot />
+</header>
+
+<style>
+  @layer components {
+    .sign {
+      display: grid;
+      gap: var(--space-2xs);
+      padding-block: var(--space-xl) var(--space-l);
+      padding-inline-start: var(--space-m);
+      border-inline-start: var(--line-stroke) solid var(--line);
+    }
+
+    .sign__label {
+      font-size: var(--fs-ui);
+      font-weight: 500;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    .sign__name {
+      font-size: var(--fs-station);
+      font-weight: 600;
+      line-height: var(--lh-tight);
+      letter-spacing: var(--tracking-sign);
+      overflow-wrap: anywhere;
+      hyphens: manual;
+    }
+  }
+</style>

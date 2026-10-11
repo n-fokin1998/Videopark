@@ -1,0 +1,141 @@
+---
+/**
+ * Line indicator (docs/design.md §5): the red line with one dot per station; the current station is lit.
+ * Phones show the compact «← prev · current · next →» form; from --bp-lg the whole line is visible.
+ * Phase 0 skeleton — the travelling dot and hover labels arrive in phase 2.
+ */
+import { localizedPath, useTranslations, type Locale } from '~/i18n';
+import { getStation, isTerminal, lineIndex, lineStations, type StationId } from '~/lib/stations';
+
+interface Props {
+  current?: StationId | undefined;
+  locale: Locale;
+}
+
+const { current, locale } = Astro.props;
+const t = useTranslations(locale);
+
+// Which stations stay visible in the compact (phone) form: neighbours on the line, or the transfers of an off-line station.
+const index = current ? lineIndex(current) : undefined;
+const near = new Set<StationId>(
+  index !== undefined
+    ? lineStations.slice(Math.max(0, index - 1), index + 2).map((s) => s.id)
+    : current
+      ? getStation(current).transfers
+      : lineStations.slice(0, 2).map((s) => s.id),
+);
+---
+
+<nav class="line" aria-label={t('a11y.lineNav')}>
+  <ol role="list" class="line__stations">
+    {lineStations.map((station) => (
+      <li
+        class:list={[
+          'line__station',
+          {
+            'is-current': station.id === current,
+            'is-near': near.has(station.id),
+            'is-terminal': isTerminal(station.id),
+          },
+        ]}
+      >
+        <a href={localizedPath(station.path, locale)} aria-current={station.id === current ? 'page' : undefined}>
+          <span class="line__dot" aria-hidden="true" />
+          <span class="line__name">{t(station.nameKey)}</span>
+        </a>
+      </li>
+    ))}
+  </ol>
+</nav>
+
+<style>
+  @layer components {
+    .line {
+      container: line / inline-size;
+    }
+
+    .line__stations {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      gap: var(--space-2xs);
+    }
+
+    /* The red line itself, drawn through the dots. */
+    .line__stations::before {
+      content: '';
+      position: absolute;
+      inset-inline: var(--space-s);
+      inset-block-start: calc(var(--hit-target) / 2 - var(--line-stroke) / 2);
+      block-size: var(--line-stroke);
+      background: var(--line);
+      border-radius: var(--radius-round);
+    }
+
+    .line__station {
+      display: none;
+      position: relative;
+    }
+
+    .line__station.is-near {
+      display: block;
+    }
+
+    .line__station a {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-3xs);
+      min-inline-size: var(--hit-target);
+      min-block-size: var(--hit-target);
+      padding-block-end: var(--space-3xs);
+      color: var(--fg-muted);
+      text-decoration: none;
+      font-size: var(--fs-ui);
+    }
+
+    .line__dot {
+      display: block;
+      inline-size: var(--dot-size);
+      block-size: var(--dot-size);
+      margin-block-start: calc(var(--hit-target) / 2 - var(--dot-size) / 2);
+      border-radius: var(--radius-round);
+      background: var(--bg);
+      border: var(--line-stroke) solid var(--line);
+    }
+
+    .is-terminal .line__dot {
+      inline-size: calc(var(--dot-size) * 1.5);
+      block-size: calc(var(--dot-size) * 1.5);
+      margin-block-start: calc(var(--hit-target) / 2 - var(--dot-size) * 0.75);
+    }
+
+    .is-current a {
+      color: var(--fg);
+      font-weight: 600;
+    }
+
+    .is-current .line__dot {
+      background: var(--line);
+      box-shadow: 0 0 0 var(--space-3xs) color-mix(in srgb, var(--line) 30%, transparent);
+    }
+
+    .line__station a:hover {
+      color: var(--fg);
+    }
+
+    /* From --bp-lg the whole line fits. */
+    @container line (width >= 52rem) {
+      .line__station {
+        display: block;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .line__stations::before,
+      .is-current .line__dot {
+        background: CanvasText;
+      }
+    }
+  }
+</style>

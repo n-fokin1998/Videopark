@@ -1,0 +1,37 @@
+---
+/**
+ * A station page: BaseLayout + station sign hero + next-station footer (docs/information-architecture.md §3).
+ * Name, description and neighbours come from the station registry (src/lib/stations.ts).
+ */
+import BaseLayout from './BaseLayout.astro';
+import StationSign from '~/components/station/StationSign.astro';
+import NextStation from '~/components/station/NextStation.astro';
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+import { getStation, type StationId } from '~/lib/stations';
+
+interface Props {
+  station: StationId;
+  /** Override the sign text (the platform shows the band name instead of «Платформа»). */
+  heading?: string | undefined;
+  label?: string | undefined;
+  /** Page title without the site suffix; defaults to the station name. Pass `null` to use the site name alone. */
+  title?: string | null | undefined;
+}
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+const { station: id, heading, label, title } = Astro.props;
+const station = getStation(id);
+const name = t(station.nameKey);
+---
+
+<BaseLayout
+  title={title === null ? undefined : (title ?? name)}
+  description={t(station.descriptionKey)}
+  station={id}
+  announce={t('a11y.stationAnnounce', { name })}
+>
+  <StationSign name={heading ?? name} label={label} />
+  <slot />
+  <NextStation slot="footer" station={id} locale={locale} />
+</BaseLayout>

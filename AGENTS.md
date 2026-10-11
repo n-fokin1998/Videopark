@@ -46,7 +46,7 @@ Agents that do not auto-load that folder (Cursor, Codex…) must read the releva
 ## 2. Tech stack (planned)
 
 - **Astro** (latest stable major, ≥ 5) — static output (`output: 'static'`), Content Layer API, `<ClientRouter />` view transitions.
-- **TypeScript** in `strict` mode (`astro/tsconfigs/strictest`).
+- **TypeScript 6.0** in `strict` mode (`astro/tsconfigs/strictest`); TS 7 waits for typescript-eslint / astro check support (D-024).
 - **Svelte 5** (confirmed) for the few stateful islands (player, timeline, lyrics viewer, station map). Everything else is zero-JS `.astro`.
 - **nanostores** for cross-island state (player queue, sound on/off, theme).
 - **GSAP** (+ ScrollTrigger, SplitText) for orchestrated motion; **Lenis** for optional smooth scroll; native **View Transitions** for page changes.
@@ -57,21 +57,22 @@ Agents that do not auto-load that folder (Cursor, Codex…) must read the releva
   **Vitest** (unit), **Playwright** + `@axe-core/playwright` (e2e + accessibility).
 - Hosting and domain: decided once the site is complete and verified locally (roadmap phase 9). Any static host works.
 
-### Commands (once scaffolded — see roadmap phase 0)
+### Commands
 
 ```bash
 pnpm install
 pnpm dev            # local dev server
-pnpm build          # static build + pagefind index
+pnpm build          # static build (+ pagefind index from phase 8)
 pnpm preview        # serve the build
 pnpm check          # astro check (types + content schemas)
 pnpm lint           # eslint
 pnpm format         # prettier --write
 pnpm test           # vitest
 pnpm test:e2e       # playwright (+ axe)
-pnpm validate:content  # relations, credits, alt text, unreferenced media, certainty report
+pnpm lighthouse     # Lighthouse budgets against pnpm preview (local, reports in .lighthouseci/)
+pnpm validate:content  # (phase 1) relations, credits, alt text, unreferenced media, certainty report
 pnpm verify         # full local quality gate: lint, check, test, build, e2e + axe, lighthouse
-pnpm media          # optimise media, generate waveforms (scripts/)
+pnpm media          # (phase 1) optimise media, generate waveforms (scripts/)
 ```
 
 Before declaring a task done, run `pnpm check && pnpm lint && pnpm test` (and `pnpm test:e2e` for UI changes).

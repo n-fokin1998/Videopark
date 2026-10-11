@@ -1,0 +1,11 @@
+/*
+ * Self-hosted fonts via Fontsource (docs/design.md §3). Each package splits files by unicode-range
+ * (cyrillic, cyrillic-ext, latin, latin-ext), so browsers download only the subsets a page uses.
+ * Ukrainian і ї є ґ live in the `cyrillic` subset (U+0400–045F, U+0490–0491); the apostrophe ʼ (U+02BC) in `latin`.
+ * The two critical files (Golos + Literata cyrillic) are preloaded in BaseLayout.
+ * TODO(phase 8): metric-matched fallback faces (size-adjust / ascent-override) to minimise swap shift.
+ */
+@import '@fontsource-variable/golos-text/wght.css';
+@import '@fontsource-variable/literata/wght.css';
+@import '@fontsource-variable/literata/wght-italic.css';
+@import '@fontsource/ibm-plex-mono/400.css';

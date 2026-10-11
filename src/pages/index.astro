@@ -1,0 +1,13 @@
+---
+/** Платформа — the arrival. Phase 2 adds the wordmark, the silent arrival sequence and the track of the evening. */
+import StationLayout from '~/layouts/StationLayout.astro';
+import StationPlaceholder from '~/components/station/StationPlaceholder.astro';
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<StationLayout station="platform" heading={t('site.name')} label={t('station.platform.name')} title={null}>
+  <StationPlaceholder />
+</StationLayout>

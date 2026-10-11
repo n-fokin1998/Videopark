@@ -1,0 +1,55 @@
+---
+/** A plain list of every station — the no-JS stand-in for the line map (404, later the «Схема» fallback). */
+import { localizedPath, useTranslations, type Locale } from '~/i18n';
+import { stations } from '~/lib/stations';
+
+interface Props {
+  locale: Locale;
+  headingId: string;
+}
+
+const { locale, headingId } = Astro.props;
+const t = useTranslations(locale);
+---
+
+<section class="list" aria-labelledby={headingId}>
+  <h2 id={headingId} class="meta">
+    {t('line.stationsHeading')}
+  </h2>
+  <ul role="list">
+    {stations.map((station) => (
+      <li class:list={[`is-${station.kind}`]}>
+        <a href={localizedPath(station.path, locale)}>{t(station.nameKey)}</a>
+      </li>
+    ))}
+  </ul>
+</section>
+
+<style>
+  @layer components {
+    .list {
+      display: grid;
+      gap: var(--space-s);
+      padding-block-end: var(--space-2xl);
+    }
+
+    ul {
+      display: grid;
+      gap: var(--space-3xs);
+      padding-inline-start: var(--space-m);
+      border-inline-start: var(--line-stroke) solid var(--line);
+    }
+
+    li.is-deep,
+    li.is-service {
+      margin-inline-start: var(--space-m);
+    }
+
+    a {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      font-size: var(--fs-body);
+    }
+  }
+</style>

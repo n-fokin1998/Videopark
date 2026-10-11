@@ -1,0 +1,145 @@
+---
+/**
+ * The shell of every page (docs/architecture.md §3, §9; .claude/rules/astro.md):
+ * <head> + SEO, theme pre-paint script, <ClientRouter />, skip links, the line indicator, the route-change live region.
+ * The persisted Player (`transition:persist="player"`) joins here in phase 2 — together with the «К плееру» skip link.
+ */
+import { ClientRouter } from 'astro:transitions';
+import golosCyrillic from '@fontsource-variable/golos-text/files/golos-text-cyrillic-wght-normal.woff2?url';
+import literataCyrillic from '@fontsource-variable/literata/files/literata-cyrillic-wght-normal.woff2?url';
+import LineIndicator from '~/components/station/LineIndicator.astro';
+import { defaultLocale, isLocale, normalizePath, useTranslations } from '~/i18n';
+import { defaultTheme, THEME_STORAGE_KEY, themes } from '~/lib/themes';
+import type { StationId } from '~/lib/stations';
+import '~/styles/main.css';
+
+interface Props {
+  /** Page title without the site suffix; omit on the platform to use the site name alone. */
+  title?: string | undefined;
+  description?: string | undefined;
+  /** Station this page belongs to: lights its dot in the line indicator. */
+  station?: StationId | undefined;
+  /** Text announced to screen readers after a client-side navigation. Defaults to the title. */
+  announce?: string | undefined;
+  noindex?: boolean;
+}
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+const { title, description = t('site.description'), station, announce, noindex = false } = Astro.props;
+
+const siteName = t('site.name');
+const fullTitle = title ? t('site.titleTemplate', { title }) : siteName;
+// build.format "file" emits music.html, but URLs are extensionless (/music).
+const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
+---
+
+<!doctype html>
+<html lang={locale} data-theme={defaultTheme}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="color-scheme" content="dark light" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:locale" content={locale} />
+
+    <link rel="preload" href={golosCyrillic} as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href={literataCyrillic} as="font" type="font/woff2" crossorigin />
+
+    <!-- Pre-paint: apply a theme pinned in «Схема» before first paint (no flash). Time-of-day themes come in phase 2. -->
+    <script is:inline define:vars={{ key: THEME_STORAGE_KEY, themes }}>
+      try {
+        const pinned = localStorage.getItem(key);
+        if (pinned && themes.includes(pinned)) document.documentElement.dataset.theme = pinned;
+      } catch {
+        /* storage unavailable: keep the default theme */
+      }
+    </script>
+    <ClientRouter />
+  </head>
+  <body>
+    <a class="skip" href="#content">
+      {t('a11y.skipToContent')}
+    </a>
+
+    <header class="site-header" transition:name="line" transition:animate="none">
+      <div class="wrap">
+        <LineIndicator current={station} locale={locale} />
+      </div>
+    </header>
+
+    <main
+      id="content"
+      tabindex="-1"
+      transition:name="station"
+      transition:animate="none"
+      data-announce={announce ?? title ?? siteName}
+    >
+      <div class="wrap">
+        <slot />
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrap">
+        <slot name="footer" />
+      </div>
+    </footer>
+
+    <div
+      class="visually-hidden"
+      aria-live="polite"
+      aria-atomic="true"
+      data-route-announcer
+      transition:persist="announcer"
+    ></div>
+
+    <script>
+      import '~/scripts/navigation';
+    </script>
+  </body>
+</html>
+
+<style>
+  @layer components {
+    .skip {
+      position: fixed;
+      inset-block-start: var(--space-2xs);
+      inset-inline-start: var(--space-2xs);
+      z-index: var(--z-skip);
+      padding: var(--space-xs) var(--space-s);
+      background: var(--accent);
+      color: var(--bg);
+      font-weight: 600;
+      border-radius: var(--radius-m);
+      transform: translateY(calc(-100% - var(--space-s)));
+      transition: transform var(--dur-instant) var(--ease-out);
+    }
+
+    .skip:focus-visible {
+      transform: none;
+      color: var(--bg);
+    }
+
+    .site-header {
+      position: relative;
+      z-index: var(--z-header);
+      padding-block: max(var(--space-s), env(safe-area-inset-top)) var(--space-2xs);
+    }
+
+    main:focus {
+      outline: none;
+    }
+  }
+</style>

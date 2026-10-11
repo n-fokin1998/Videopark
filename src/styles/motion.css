@@ -1,0 +1,102 @@
+/*
+ * Motion (docs/design.md §7) and station-to-station view transitions (information-architecture.md §4).
+ * html[data-direction] is set by src/scripts/navigation.ts from the station registry:
+ *   forward → content leaves left / enters from the right (a train leaving); back → mirrored; none → crossfade.
+ * The `station` view-transition name is on <main>; the header (`line`) never animates out.
+ */
+@layer base {
+  @keyframes vt-fade-out {
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes vt-fade-in {
+    from {
+      opacity: 0;
+    }
+  }
+
+  @keyframes vt-leave-left {
+    to {
+      opacity: 0;
+      transform: translateX(-12%);
+    }
+  }
+
+  @keyframes vt-enter-right {
+    from {
+      opacity: 0;
+      transform: translateX(12%);
+    }
+  }
+
+  @keyframes vt-leave-right {
+    to {
+      opacity: 0;
+      transform: translateX(12%);
+    }
+  }
+
+  @keyframes vt-enter-left {
+    from {
+      opacity: 0;
+      transform: translateX(-12%);
+    }
+  }
+
+  ::view-transition-group(station) {
+    animation-duration: var(--dur-long);
+  }
+
+  ::view-transition-old(station) {
+    animation: vt-fade-out calc(var(--dur-long) * 0.5) var(--ease-in) both;
+  }
+
+  ::view-transition-new(station) {
+    animation: vt-fade-in var(--dur-long) var(--ease-out) both;
+  }
+
+  html[data-direction='forward']::view-transition-old(station) {
+    animation: vt-leave-left calc(var(--dur-long) * 0.6) var(--ease-in) both;
+  }
+
+  html[data-direction='forward']::view-transition-new(station) {
+    animation: vt-enter-right var(--dur-long) var(--ease-out) both;
+  }
+
+  html[data-direction='back']::view-transition-old(station) {
+    animation: vt-leave-right calc(var(--dur-long) * 0.6) var(--ease-in) both;
+  }
+
+  html[data-direction='back']::view-transition-new(station) {
+    animation: vt-enter-left var(--dur-long) var(--ease-out) both;
+  }
+
+  /* The line indicator and (later) the player stay put. */
+  ::view-transition-old(line),
+  ::view-transition-new(line) {
+    animation: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: var(--dur-reduced) !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: var(--dur-reduced) !important;
+      scroll-behavior: auto !important;
+    }
+
+    ::view-transition-old(*),
+    html[data-direction]::view-transition-old(station) {
+      animation: vt-fade-out var(--dur-reduced) linear both !important;
+    }
+
+    ::view-transition-new(*),
+    html[data-direction]::view-transition-new(station) {
+      animation: vt-fade-in var(--dur-reduced) linear both !important;
+    }
+  }
+}

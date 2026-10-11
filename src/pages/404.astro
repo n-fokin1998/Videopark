@@ -1,0 +1,26 @@
+---
+/** «Станция закрыта» — with the list of stations as a no-JS line map (docs/information-architecture.md §10). */
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import StationSign from '~/components/station/StationSign.astro';
+import LineList from '~/components/station/LineList.astro';
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<BaseLayout title={t('notFound.title')} description={t('notFound.description')} noindex>
+  <StationSign name={t('notFound.title')}>
+    <p class="note">{t('notFound.text')}</p>
+  </StationSign>
+  <LineList locale={locale} headingId="line-list" />
+</BaseLayout>
+
+<style>
+  @layer components {
+    .note {
+      font-size: var(--fs-h2);
+      color: var(--fg-muted);
+    }
+  }
+</style>
