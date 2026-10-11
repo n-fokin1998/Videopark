@@ -1,0 +1,15 @@
+# TODO(content): kind/date/event inferred from the YouTube title only — confirm with the owner.
+title: Люблю отдыхать (feat. Полотенчик)
+sourceTitle: Станция Видеопар feat Полотенчик - Люблю Отдыхать
+kind: other
+provider: youtube
+id: 9I2-FvHA_y8
+songs:
+  - lyublyu-otdykhat
+credit:
+  role: источник
+  name: YouTube
+certainty: probable
+sources:
+  - title: "YouTube: Станция Видеопар feat Полотенчик - Люблю Отдыхать"
+    url: https://www.youtube.com/watch?v=9I2-FvHA_y8

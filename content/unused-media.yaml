@@ -1,0 +1,11 @@
+# Owner-provided media files that are deliberately not used by any entry, with the reason.
+# scripts/validate-content.ts reports these as info instead of "unreferenced" warnings.
+# Paths are relative to the project root. Issues: docs/content-inventory.md §3.
+- path: content/tracks/Хорошее время/33 - 37.flac
+  reason: Byte-identical to «RAW STUFF VOL. 5/33 - 37.flac» (issue A) — the shared recording uses the RAW STUFF file.
+- path: content/tracks/Хорошее время/Будни.flac
+  reason: Byte-identical to «В ногу с суетой/Будни (Instrumental).flac» (issue B) — one recording on both releases.
+- path: content/tracks/Хорошее время/Автоответчик.flac
+  reason: Same recording as «RAW STUFF VOL. 5/Автоответчик.flac» (lossy re-encode, issue I) — the shared recording uses the RAW STUFF file.
+- path: content/tracks/Хорошее время/Хорошее время.flac
+  reason: Same recording as «RAW STUFF VOL. 5/Хорошее время.flac» (lossy re-encode, issue I) — the shared recording uses the RAW STUFF file.

@@ -154,3 +154,24 @@ Format: `## D-NNN — Title` · Status (Proposed / Accepted / Superseded by D-xx
     files in `src/pages/`. Station pages are thin wrappers around `StationLayout`, so a localized route is a few lines.
 - **Consequences:** Upgrading to TypeScript 7 is a separate, deliberate change. Breakpoint tokens live in `tokens.css` as reference values;
   media queries repeat the numbers (custom properties cannot be used in `@media`), and components prefer container queries.
+
+## D-025 — Phase 1 content tooling
+- **Status:** Accepted · 2026-10-11
+- **Context:** The relations graph, its unit tests and `scripts/validate-content.ts` need the content outside Astro (Vitest, `tsx`), but schemas
+  must not be written twice.
+- **Decision:**
+  - Schemas are defined once in `src/lib/content/schemas.ts` as `defineSchemas(ref, image)`. `src/content.config.ts` passes Astro's
+    `reference()`/`image()`; `src/lib/content/raw.ts` passes plain strings and reads `content/` with `node:fs` + `yaml`. The graph
+    (`src/lib/content/relations.ts`) works on that raw form (ids only); pages fetch rich entries by id with `getCollection`/`getEntry`.
+  - Entry ids = file names; timeline is one YAML list per year, read by a small custom loader (`src/lib/content/loaders.ts`).
+  - Lyrics and writings bodies are plain text rendered with preserved line breaks, not Markdown.
+  - New dev dependencies: **`tsx`** (runs `scripts/*.ts`, required by `.claude/rules/typescript.md`; ~ esbuild, already in the tree via Vite) and
+    **`yaml`** (YAML 1.2 parser for the raw reader and the timeline loader; already a transitive dependency of Astro). pnpm is allowed to run
+    esbuild's install script (`allowBuilds`), needed by `tsx`.
+  - `pnpm media` (`scripts/media.ts`) is idempotent, uses ffmpeg/ffprobe from PATH, and writes only to git-ignored `public/media/`; image
+    metadata is reported, and stripped in place only with `--strip-exif` (lossless, refuses EXIF-rotated images).
+  - `pnpm validate:content` joins the `pnpm verify` gate; a Vitest test also asserts it reports no errors or warnings.
+  - The developer page `/debug/content` is generated only in `astro dev` or with `DEBUG_PAGES=1`, never in a normal build. It is not
+    user-facing, so its labels are English and not in `ru.ts`.
+- **Consequences:** A schema change is made in one place. `public/media/` (≈ 270 MB once generated) is copied into `dist/` by `astro build`;
+  where it is served from in production is still the phase 9 decision (D-021).

@@ -1,0 +1,7 @@
+name:
+  ru: Powerhouse
+kind: venue
+within: moskva
+sources:
+  - title: Видео в архиве проекта
+    note: content/videos/links.txt

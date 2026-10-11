@@ -1,0 +1,48 @@
+- id: repetitsiya-kyiv-2019
+  date: "2019"
+  rail: life
+  kind: rehearsal
+  title:
+    ru: Репетиция, Киев
+  links:
+    places:
+      - kyiv
+  videos:
+    - repetitsiya-kyiv-2019
+  sources:
+    - title: "YouTube: СТАНЦИЯ ВИДЕОПАРК – Rehearsal (Kyiv, 2019)"
+      note: content/videos/repetitsiya-kyiv-2019.yaml
+- id: powerhouse-2019
+  date: "2019-06-13"
+  rail: life
+  kind: concert
+  title:
+    ru: "Omut: naive perspective, Powerhouse, Москва"
+  links:
+    songs:
+      - dotronutsya-do-solntsa
+    places:
+      - powerhouse
+      - moskva
+  videos:
+    - dotronutsya-do-solntsa-powerhouse-2019
+  sources:
+    - title: "YouTube: Станция Видеопарк - Дотронуться до солнца (13.06.19)"
+      note: content/videos/dotronutsya-do-solntsa-powerhouse-2019.yaml
+- id: volna-2-2019
+  date: "2019-08-10"
+  rail: life
+  kind: concert
+  title:
+    ru: Фестиваль «Волна-2», Москва
+  links:
+    songs:
+      - prikhodit-k-tebe
+    places:
+      - bumazhnaya-fabrika
+      - moskva
+  videos:
+    - prikhodit-k-tebe-volna-2-2019
+  sources:
+    - title: "YouTube: Станция Видеопарк - Приходить к тебе (10.08.19)"
+      note: content/videos/prikhodit-k-tebe-volna-2-2019.yaml

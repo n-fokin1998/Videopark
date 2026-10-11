@@ -1,0 +1,8 @@
+name:
+  ru: «Сторона»
+role: press
+bio:
+  ru: Издательство, которому Женя дал интервью о своих проектах.
+sources:
+  - title: Интервью Жени Мычака издательству «Сторона»
+    note: content/interviews/storona.md

@@ -1,0 +1,11 @@
+# TODO(content): tracklist inside this file unknown — add `chapters` if it is ever restored («Архив ищет»).
+title: Мой милый дом
+version: full-release
+recorded:
+  from: "2017-03"
+  to: "2017-10"
+  place: brovary
+duration: "24:12"
+audio:
+  file: Мой милый дом/Мой милый дом.flac
+certainty: probable

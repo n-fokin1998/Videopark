@@ -1,0 +1,65 @@
+# TODO(content): captions (place, people, photographer) — add notes.md to this folder (roadmap Q11).
+# Credit «Архив проекта» until the photographers are known. `featured` = copied by the owner into portraits/.
+title:
+  ru: "2017"
+period:
+  from: "2017"
+source: band
+order: 2017
+photos:
+  - file: ./6GnEfq5DCWLcaZMwG5oiUxjiylhHO44nkCl9H5BtF2TS_-_5QK2bpMDfqs5V1FO7McFvJHAc.jpg
+    alt: "Плёночное фото: молодой человек в тёмном пальто сидит у шершавой стены, склонив голову, рядом вешалка и белая труба"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+    featured: true
+  - file: ./6qTVXNKraZDEs2uR6QVLt-0MtlOb94-AAq7570PKghl4Pq013iRdbTT_Dl3YxhF6VnR-XLKh.jpg
+    alt: "Чёрно-белое фото: молодой человек в белой футболке поёт в микрофон и играет на электрогитаре на тёмной сцене"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./AkkWy00cpSN9wvL-c3o82DHqgrF5npPOcUdC6LoM-0P2WH94dWDoyAFjDqEeKx8-J1lq8pirDPxViQ.jpg
+    alt: "Чёрно-белое фото: трое молодых людей сидят на диване, у крайних электрогитара и акустическая гитара"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./Bmg6xa0pAFIk-x_hRLDL5fSGBL6WpaTzB1ufRsK522WDFBG__xXsjyvOraDBYEXUbYupT2zbhIiHHQ.jpg
+    alt: Четверо молодых людей в летней одежде у большого каменного шара на газоне среди ёлок и берёз, день
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./DdSWT1FlGuI_K6nW5a0Fp_SXho40j2BaSHT3Gtspr2jCym3qZPIgtjKfh5_8icifM8Eyei1Ge6n1hA.jpg
+    alt: "Плёночное фото: двое парней в клубе, один в бордовой кепке и футболке «Levi’s», другой в чёрной рубашке"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./KaQub5c1rxeZCJZQFWobVmFAe28GiaFGvr4pVMyxQt6hxgpsMON8uDWSmb2fiJ5XotfsyR8irnTUno7WGwDYfm0Y.jpg
+    alt: Двое парней сидят у белой стены под чёрной акустической гитарой, рядом бас-гитара, один держит плёночный фотоаппарат
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./cOGpO3UIP88epZQp6Qh0R99NWwHf_lVESXauiCtOGQ_tjlbHrM8hyttHOCfbZSPe51wfmw4JhEE8jn_bYc5Z3D4t.jpg
+    alt: "Плёночное фото ночью: трое молодых людей у роллеты с граффити, один сидит на корточках с сигаретой"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./cpUqFAcNMSRQmqnwpzg_t5qs8BcBJ6MVB8AHghCDKyKnGFC9Oi39MAdymk8ueLGdOI59nsLRFekWHkl-R7z9Yzjq.jpg
+    alt: Двое парней и девушка в тёмной одежде и джинсах позируют у светлой деревянной стены
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./nV6jqmpJeK0r6E-d4cTQi4AMVv5rmgI5EWMM2acT-H-eyJhy0PTpu_E6PD43D5kT77qGotGc.jpg
+    alt: "Репетиционная комната с жёлтыми рисунками рук на стенах: бас-гитарист в кепке, гитарист у микрофона, барабанщик спиной"
+    date: "2017"
+    credit:
+      role: фото
+      name: Архив проекта

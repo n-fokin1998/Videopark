@@ -1,0 +1,19 @@
+# TODO(content): kind/date/event inferred from the YouTube title only — confirm with the owner.
+title: Лес
+sourceTitle: Станция Видеопарк - Лес (odyssey 10.03.17)
+kind: concert
+date: "2017-03-10"
+event:
+  name: odyssey
+  date: "2017-03-10"
+provider: youtube
+id: CKKDfqhFUz8
+songs:
+  - les
+credit:
+  role: источник
+  name: YouTube
+certainty: probable
+sources:
+  - title: "YouTube: Станция Видеопарк - Лес (odyssey 10.03.17)"
+    url: https://www.youtube.com/watch?v=CKKDfqhFUz8

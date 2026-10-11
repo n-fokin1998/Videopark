@@ -1,0 +1,20 @@
+title: Northern Sun
+sourceTitle: Станция Видеопарк - Northern Sun
+kind: concert
+date: "2018-06-23"
+event:
+  name: Концерт в More Music Club
+  venue: more-music-club
+  city: odesa
+  date: "2018-06-23"
+provider: youtube
+id: 7vNx-0Nvx64
+songs:
+  - northern-sun
+credit:
+  role: источник
+  name: YouTube
+sources:
+  - title: "YouTube: Станция Видеопарк - Northern Sun"
+    url: https://www.youtube.com/watch?v=7vNx-0Nvx64
+    note: Концерт в MoreMusicClub 23.06.2018, Одесса

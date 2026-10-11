@@ -1,0 +1,33 @@
+- id: odyssey-2017
+  date: "2017-03-10"
+  rail: life
+  kind: concert
+  certainty: probable
+  title:
+    ru: «Лес» на odyssey
+  links:
+    songs:
+      - les
+  videos:
+    - les-odyssey-2017
+  sources:
+    - title: "YouTube: Станция Видеопарк - Лес (odyssey 10.03.17)"
+      note: content/videos/les-odyssey-2017.yaml
+- id: anons-moi-milyi-dom
+  date: "2017-08"
+  rail: life
+  kind: press
+  title:
+    ru: Neformat анонсирует альбом «Мой милый дом»
+  text:
+    ru: В анонсе упоминается песня «Нет ничего проще»; выход планируется на 21 сентября 2017 года.
+  links:
+    releases:
+      - moi-milyi-dom
+    songs:
+      - net-nichego-proshche
+    people:
+      - neformat
+  sources:
+    - title: Neformat, август 2017
+      note: по данным базы знаний проекта; ссылка не сохранена

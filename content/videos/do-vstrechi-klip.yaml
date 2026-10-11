@@ -1,0 +1,13 @@
+# TODO(content): director/author and date of the music video unknown (content-inventory §6).
+title: До встречи
+kind: clip
+provider: local
+file: До_встречи_Music_Video.mp4
+duration: "2:19"
+songs:
+  - do-vstrechi
+credit:
+  role: видео
+  name: Архив проекта
+sources:
+  - title: Сведения, предоставленные владельцем проекта

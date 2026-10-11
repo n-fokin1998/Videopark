@@ -1,0 +1,11 @@
+name:
+  ru: Гидропарк
+  uk: Гідропарк
+  en: Hidropark
+kind: metro
+within: kyiv
+description:
+  ru: "Станция киевского метро. Подъезжая к ней, маленький мальчик крикнул маме: «Станция Видеопарк!»"
+sources:
+  - title: Интервью Жени Мычака издательству «Сторона»
+    note: content/interviews/storona.md

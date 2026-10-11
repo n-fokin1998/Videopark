@@ -1,0 +1,22 @@
+# TODO(content): captions (place, people, photographer) — add notes.md to this folder (roadmap Q11).
+# Credit «Архив проекта» until the photographers are known. `featured` = copied by the owner into portraits/.
+title:
+  ru: "2016"
+period:
+  from: "2016"
+source: band
+order: 2016
+photos:
+  - file: ./MXt05YM9SDDtpAgtMXzlnpzSByyfyW7NOBCQMQGMmZ8v7OH4ZtrO22mEYy1Lx_75jMOdb2Ol5enMEVwgsIyyTw6m.jpg
+    alt: "Плёночное фото: четверо молодых людей сидят в тесной светлой комнате, один в шапке играет на акустической гитаре"
+    date: "2016"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./vXRA__NxIcgU9JgJTNH1DtAHzjMkgOM0FbebliGsQHCd21mDDw1rqmQF853PmoYicpGQ05V0.jpg
+    alt: "Плёночное фото: молодой человек с микрофоном у микшерного пульта, вокруг танцуют слушатели в помещении с утеплённым потолком"
+    date: "2016"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
