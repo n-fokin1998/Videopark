@@ -1,0 +1,12 @@
+dist/
+.astro/
+node_modules/
+pnpm-lock.yaml
+public/media/
+.lighthouseci/
+playwright-report/
+test-results/
+# Owner-provided content and research: never reformat (verbatim texts).
+content/
+docs/
+*.md

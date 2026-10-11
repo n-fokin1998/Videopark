@@ -32,3 +32,8 @@ content/**/*.webm
 # generated media (pnpm media)
 public/media/
 .media-cache/
+
+# test & audit output
+playwright-report/
+test-results/
+.lighthouseci/

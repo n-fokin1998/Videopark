@@ -1,0 +1,2 @@
+/* Cascade layer order (styling rules). Astro scoped component styles wrap themselves in @layer components. */
+@layer reset, tokens, base, components, utilities;

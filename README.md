@@ -7,4 +7,11 @@ A digital archive and musical memorial for «Станция Видеопарк»
   Design: [docs/design.md](docs/design.md) · Plan: [docs/roadmap.md](docs/roadmap.md)
 - Source research (RU): [content/knowlage-base/](content/knowlage-base/)
 
-Status: documentation phase — the Astro project is not scaffolded yet (see roadmap, phase 0).
+Status: phase 0 (foundations) done — the empty line of stations is walkable. Next: phase 1, content model & ingestion.
+
+```bash
+pnpm install
+pnpm exec playwright install   # browsers for e2e (once)
+pnpm dev                       # http://localhost:4321
+pnpm verify                    # full local quality gate
+```

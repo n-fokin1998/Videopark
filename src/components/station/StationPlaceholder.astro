@@ -1,0 +1,22 @@
+---
+/** Honest empty state for a station that is not built yet (roadmap phase 0). */
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<p class="placeholder">{t('placeholder.stationOpening')}</p>
+
+<style>
+  @layer components {
+    .placeholder {
+      padding-block: var(--space-xl);
+      font-family: var(--font-poem);
+      font-size: var(--fs-quote);
+      font-style: italic;
+      color: var(--fg-muted);
+      max-inline-size: var(--measure-prose);
+    }
+  }
+</style>

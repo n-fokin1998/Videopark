@@ -1,0 +1,105 @@
+/*
+ * Design tokens (docs/design.md). Raw palette + scales. Components never use palette tokens directly —
+ * only the semantic tokens defined per theme in themes.css.
+ */
+@layer tokens {
+  :root {
+    /* Core palette (Evening) — design.md §2 */
+    --c-night: #0e1117;
+    --c-dusk: #171e2a;
+    --c-twilight: #2c3a55;
+    --c-haze: #5e6f8f;
+    --c-paper: #ece6da;
+    --c-ink: #1a1a1a;
+    --c-lamp: #e9a94b;
+    --c-line: #c2453d;
+    --c-water: #7a9bb3;
+    --c-moss: #6f7d5c;
+
+    /* Typography — design.md §3 */
+    --font-sign: 'Golos Text Variable', 'Golos Text', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+    --font-poem: 'Literata Variable', 'Literata', Georgia, 'Times New Roman', serif;
+    --font-tape: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+
+    /* Fluid type scale: 360px → 1440px viewport */
+    --fs-station: clamp(3.5rem, 2.33rem + 5.19vw, 7.5rem);
+    --fs-h1: clamp(2.5rem, 2.08rem + 1.85vw, 4rem);
+    --fs-h2: clamp(1.75rem, 1.54rem + 0.93vw, 2.5rem);
+    --fs-quote: clamp(1.5rem, 1.29rem + 0.93vw, 2.25rem);
+    --fs-lyrics: clamp(1.1875rem, 1.13rem + 0.23vw, 1.5rem);
+    --fs-body: clamp(1.0625rem, 1.03rem + 0.12vw, 1.1875rem);
+    --fs-ui: clamp(0.875rem, 0.85rem + 0.12vw, 1rem);
+    --fs-meta: clamp(0.75rem, 0.74rem + 0.06vw, 0.8125rem);
+
+    --lh-tight: 1.05;
+    --lh-heading: 1.15;
+    --lh-ui: 1.4;
+    --lh-body: 1.65;
+    --lh-lyrics: 1.6;
+
+    --tracking-sign: 0.02em;
+    --tracking-label: 0.12em;
+
+    --measure-prose: 66ch;
+    --measure-lyrics: 36ch;
+
+    /* Spacing (fluid) */
+    --space-3xs: 0.25rem;
+    --space-2xs: 0.5rem;
+    --space-xs: 0.75rem;
+    --space-s: 1rem;
+    --space-m: clamp(1.25rem, 1.15rem + 0.46vw, 1.5rem);
+    --space-l: clamp(1.75rem, 1.56rem + 0.83vw, 2.5rem);
+    --space-xl: clamp(2.5rem, 2.08rem + 1.85vw, 4rem);
+    --space-2xl: clamp(4rem, 3.17rem + 3.7vw, 7rem);
+
+    /* Side gutters: ≥ 16px on phones, generous on desktop — design.md §6 */
+    --gutter: clamp(1rem, 0.33rem + 2.96vw, 4rem);
+    --content-max: 72rem;
+    --content-wide: 105rem; /* cap at --bp-2xl: grow atmosphere, not text */
+
+    /* Breakpoints — reference values. CSS custom properties cannot be used inside @media,
+       so media queries repeat the number with a comment naming the token. Prefer container queries. */
+    --bp-md: 640px;
+    --bp-lg: 960px;
+    --bp-xl: 1280px;
+    --bp-2xl: 1680px;
+
+    /* Shape */
+    --radius-s: 2px;
+    --radius-m: 6px;
+    --radius-l: 14px;
+    --radius-round: 999px;
+    --border-thin: 1px;
+    --line-stroke: 3px;
+    --dot-size: 0.75rem;
+    --hit-target: 44px;
+
+    /* Motion — design.md §7 */
+    --dur-instant: 120ms;
+    --dur-short: 240ms;
+    --dur-medium: 500ms;
+    --dur-long: 800ms;
+    --dur-slow: 1400ms;
+    --dur-reduced: 150ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+    --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+
+    /* Layers */
+    --z-base: 0;
+    --z-header: 10;
+    --z-player: 20;
+    --z-overlay: 30;
+    --z-grain: 40;
+    --z-toast: 50;
+    --z-skip: 60;
+  }
+
+  /* Phones: shorter station-to-station transitions (≈ 500ms) — below --bp-md */
+  @media (width < 640px) {
+    :root {
+      --dur-long: 500ms;
+    }
+  }
+}

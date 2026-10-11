@@ -1,0 +1,151 @@
+---
+/**
+ * Next-station footer (docs/information-architecture.md §3.4): «Следующая станция — X» as a full-width target,
+ * a smaller «← Предыдущая», transfers (e.g. История → Женя), and «Конечная» on the terminal.
+ */
+import { localizedPath, useTranslations, type Locale } from '~/i18n';
+import { getStation, isTerminal, neighbours, type StationId } from '~/lib/stations';
+
+interface Props {
+  station: StationId;
+  locale: Locale;
+}
+
+const { station: id, locale } = Astro.props;
+const t = useTranslations(locale);
+const station = getStation(id);
+const { previous, next } = neighbours(id);
+const terminal = isTerminal(id);
+const transfers = station.transfers.map(getStation);
+const platform = getStation('platform');
+---
+
+<nav class="next" aria-label={t('line.onward')}>
+  {next && (
+    <a class="next__main" href={localizedPath(next.path, locale)} rel="next">
+      <span class="next__label">{t('line.next')}</span>
+      <span class="next__name">{t(next.nameKey)}</span>
+      <span class="next__arrow" aria-hidden="true" />
+    </a>
+  )}
+
+  {terminal && (
+    <p class="next__terminal">
+      <span class="next__name">{t('line.terminal')}</span>
+      <span class="next__label">{t('line.terminalNote')}</span>
+    </p>
+  )}
+
+  <ul role="list" class="next__links">
+    {previous && (
+      <li>
+        <a href={localizedPath(previous.path, locale)} rel="prev">
+          <span aria-hidden="true">←</span>
+          {t('line.previousStation', { name: t(previous.nameKey) })}
+        </a>
+      </li>
+    )}
+    {transfers.map((transfer) => (
+      <li>
+        <a href={localizedPath(transfer.path, locale)}>{t('line.transferTo', { name: t(transfer.nameKey) })}</a>
+      </li>
+    ))}
+    {terminal && (
+      <li>
+        <a href={localizedPath(platform.path, locale)}>{t('line.backToStart')}</a>
+      </li>
+    )}
+  </ul>
+</nav>
+
+<style>
+  @layer components {
+    .next {
+      display: grid;
+      gap: var(--space-m);
+      padding-block: var(--space-xl);
+      border-block-start: var(--border-thin) solid var(--border);
+    }
+
+    .next__main {
+      position: relative;
+      display: grid;
+      gap: var(--space-3xs);
+      padding-block: var(--space-m);
+      padding-inline: var(--space-m) calc(var(--space-xl) + var(--space-m));
+      border-inline-start: var(--line-stroke) solid var(--line);
+      color: var(--fg);
+      text-decoration: none;
+      background: var(--bg-raised);
+      border-radius: 0 var(--radius-m) var(--radius-m) 0;
+      transition: background-color var(--dur-instant) var(--ease-out);
+    }
+
+    .next__main:hover {
+      background: color-mix(in srgb, var(--bg-raised) 80%, var(--line));
+      color: var(--fg);
+    }
+
+    .next__label {
+      font-size: var(--fs-ui);
+      color: var(--fg-muted);
+    }
+
+    .next__name {
+      font-size: var(--fs-h2);
+      font-weight: 600;
+      line-height: var(--lh-heading);
+    }
+
+    /* The red line arrow. */
+    .next__arrow {
+      position: absolute;
+      inset-inline-end: var(--space-m);
+      inset-block-start: 50%;
+      inline-size: var(--space-l);
+      block-size: var(--line-stroke);
+      background: var(--line);
+      transform: translateY(-50%);
+      transition: transform var(--dur-instant) var(--ease-out);
+    }
+
+    .next__arrow::after {
+      content: '';
+      position: absolute;
+      inset-inline-end: 0;
+      inset-block-start: 50%;
+      inline-size: var(--space-xs);
+      block-size: var(--space-xs);
+      border-block-start: var(--line-stroke) solid var(--line);
+      border-inline-end: var(--line-stroke) solid var(--line);
+      transform: translateY(-50%) rotate(45deg);
+    }
+
+    @media (hover: hover) {
+      .next__main:hover .next__arrow {
+        transform: translate(var(--space-3xs), -50%);
+      }
+    }
+
+    .next__terminal {
+      display: grid;
+      gap: var(--space-3xs);
+      padding-inline-start: var(--space-m);
+      border-inline-start: var(--line-stroke) solid var(--line);
+    }
+
+    .next__links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs) var(--space-m);
+      font-size: var(--fs-ui);
+    }
+
+    .next__links a {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3xs);
+      min-block-size: var(--hit-target);
+    }
+  }
+</style>

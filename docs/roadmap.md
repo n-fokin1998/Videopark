@@ -33,14 +33,15 @@ After MVP: Видео (music video + 12 concert videos — small enough to ship 
 
 ## Phase 0 — Foundations (VDPRK-1…)
 
-- [ ] Scaffold Astro (latest) + TS strictest, pnpm, Node LTS pin, `.editorconfig`.
-- [ ] ESLint (flat) + Prettier with astro/svelte plugins; `pnpm check`/`lint`/`format`/`test` scripts.
-- [ ] Svelte 5 integration, nanostores, sitemap.
-- [ ] `src/styles/` tokens + 4 themes + cascade layers + responsive breakpoints/containers; fonts via Fontsource (verify Cyrillic + Ukrainian subsets).
-- [ ] `src/i18n/` skeleton (`ru` only, unprefixed), `t()` helper, `src/lib/stations.ts` registry.
-- [ ] `BaseLayout` (head, theme pre-paint script, `<ClientRouter />`, skip links, live region) and `StationLayout`.
-- [ ] Empty routes for all stations with station sign + next-station footer.
-- [ ] Local quality gate script: lint → check → test → build → Playwright smoke + axe → Lighthouse (local run). Hosted CI comes with phase 9.
+- [x] Scaffold Astro (latest) + TS strictest, pnpm, Node LTS pin, `.editorconfig`.
+- [x] ESLint (flat) + Prettier with astro/svelte plugins; `pnpm check`/`lint`/`format`/`test` scripts.
+- [x] Svelte 5 integration, nanostores, sitemap.
+- [x] `src/styles/` tokens + 4 themes + cascade layers + responsive breakpoints/containers; fonts via Fontsource (verify Cyrillic + Ukrainian subsets).
+- [x] `src/i18n/` skeleton (`ru` only, unprefixed), `t()` helper, `src/lib/stations.ts` registry.
+- [x] `BaseLayout` (head, theme pre-paint script, `<ClientRouter />`, skip links, live region) and `StationLayout`.
+- [x] Empty routes for all stations with station sign + next-station footer.
+- [x] Local quality gate script: lint → check → test → build → Playwright smoke + axe → Lighthouse (local run). Hosted CI comes with phase 9.
+- Status: done (VDPRK-1). Firefox e2e is opt-out locally via `E2E_SKIP_FIREFOX=1` (D-024).
 - **Done when:** you can walk the whole empty line with transitions, keyboard only, at 360 px and on desktop, with zero a11y violations.
 
 ## Phase 1 — Content model & ingestion

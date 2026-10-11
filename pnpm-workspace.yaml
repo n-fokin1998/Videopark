@@ -1,0 +1,5 @@
+# eslint-plugin-astro auto-installs eslint-plugin-jsx-a11y as an optional peer; we use the
+# ESLint 10-compatible fork eslint-plugin-jsx-a11y-x instead (see eslint.config.js).
+peerDependencyRules:
+  allowedVersions:
+    eslint-plugin-jsx-a11y>eslint: '10'

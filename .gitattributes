@@ -1,0 +1,9 @@
+# LF everywhere (matches .editorconfig and Prettier), regardless of core.autocrlf.
+* text=auto eol=lf
+
+*.woff2 binary
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.flac binary
+*.mp4 binary

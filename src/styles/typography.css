@@ -1,0 +1,39 @@
+/* Typography roles (docs/design.md §3): Golos = sign/UI, Literata = poem/prose, Plex Mono = tape/data. */
+@layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-sign);
+    font-weight: 600;
+    line-height: var(--lh-heading);
+    letter-spacing: var(--tracking-sign);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--fs-h1);
+  }
+
+  h2 {
+    font-size: var(--fs-h2);
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  .prose {
+    font-family: var(--font-poem);
+    font-size: var(--fs-body);
+    line-height: var(--lh-body);
+    max-inline-size: var(--measure-prose);
+  }
+
+  .meta {
+    font-family: var(--font-tape);
+    font-size: var(--fs-meta);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--fg-muted);
+  }
+}
