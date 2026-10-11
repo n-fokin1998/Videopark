@@ -46,14 +46,17 @@ After MVP: Видео (music video + 12 concert videos — small enough to ship 
 
 ## Phase 1 — Content model & ingestion
 
-- [ ] `src/content.config.ts` with all collections ([content-model.md](content-model.md)).
-- [ ] Convert `content/knowlage-base/releases.md` → `releases/`, `songs/`, `recordings/` (all releases 2016–2020 incl. archival, RAW STUFF VOL. 5).
-- [ ] Convert `biography.md` → `timeline/`, `eras/`, `people/`, `places/`, `quotes/`, `pages/zhenya.ru.md`; interview → `interviews/storona.md`.
-- [ ] Ingest owner-provided media per [content-inventory.md](content-inventory.md): tracks, covers, photos (+ `portraits` as featured), lyrics, `videos/links.txt`, `instagram/posts.txt`; writings (`стихи.txt`, `проза.txt`) → `writings/`; concerts from videos → `timeline/`.
-- [ ] `src/lib/content/relations.ts` + unit tests against real data.
-- [ ] `scripts/validate-content.ts` (alt text, credits, broken refs, certainty report, unreferenced media files).
-- [ ] Media pipeline script (`pnpm media`, needs ffmpeg): EXIF strip, FLAC → AAC 160k, peaks into git-ignored `public/media/` (D-021).
+- [x] `src/content.config.ts` with all collections ([content-model.md](content-model.md)); schemas shared in `src/lib/content/schemas.ts`.
+- [x] Convert `content/knowlage-base/releases.md` → `releases/`, `songs/`, `recordings/` (all releases 2016–2020 incl. archival, RAW STUFF VOL. 5).
+- [x] Convert `biography.md` → `timeline/`, `eras/`, `people/`, `places/`, `quotes/`, `pages/zhenya.ru.md`; interview → `interviews/storona.md`.
+- [x] Ingest owner-provided media per [content-inventory.md](content-inventory.md): tracks, covers, photos (+ `portraits` as featured), lyrics, `videos/links.txt`, `instagram/posts.txt`; writings (`стихи.txt`, `проза.txt`) → `writings/`; concerts from videos → `timeline/`.
+- [x] `src/lib/content/relations.ts` + unit tests against real data.
+- [x] `scripts/validate-content.ts` (alt text, credits, broken refs, certainty report, unreferenced media files).
+- [x] Media pipeline script (`pnpm media`, needs ffmpeg): EXIF strip, FLAC → AAC 160k, peaks into git-ignored `public/media/` (D-021).
 - **Done when:** `pnpm check` validates all entries; a debug page lists every entity with its transfers.
+- Status: done (VDPRK-2). 25 releases, 50 songs, 57 recordings, 15 timeline events, 6 eras, 17 people, 10 places, 11 quotes, 5 writings,
+  6 photo albums, 13 videos, 7 Instagram posts, the interview and two pages (`zhenya`, `name-origin`). Debug page: `/debug/content`
+  (`pnpm dev`, or a build with `DEBUG_PAGES=1`). Content issues A, B, I, J resolved by the owner (shared recordings; photos shown as provided).
 
 ## Phase 2 — Platform, navigation, player (the spine)
 
@@ -147,6 +150,6 @@ After MVP: Видео (music video + 12 concert videos — small enough to ship 
 | Q7 | URL scheme for locales | Resolved: RU unprefixed (D-007) |
 | Q8 | How to make the illustrated scenes (platform, name-origin scene, Brovary map): code-drawn SVG, illustrator, or photo-based — see [design.md §10](design.md#10-iconography--illustration) | Open — default: code-drawn SVG |
 | Q9 | Which exact Instagram posts to include | Resolved: 7 posts in `content/instagram/posts.txt` |
-| Q10 | Content issues A–H (duplicate audio files, missing tracks/covers, cover credits, EP date source) | Open — see [content-inventory.md §3](content-inventory.md#3-issues-that-need-the-owners-decision) |
+| Q10 | Content issues C–H (missing tracks/covers, cover credits, EP date source); A, B, I, J resolved | Open — see [content-inventory.md §3](content-inventory.md#3-issues-that-need-the-owners-decision) |
 | Q11 | Captions for photos (date, place, people, photographer) | Open — optional `notes.md` per photo folder; agent writes alt text meanwhile |
 | Q12 | Missing lyrics (≈ 21 songs) and confirmation of instrumentals («Будни», «Какой-то там час (интро)») | Open |

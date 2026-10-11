@@ -1,0 +1,159 @@
+---
+/**
+ * Developer-only content inspector (roadmap phase 1 "debug page"): every entity of every collection with its
+ * transfers («Пересадки»), broken references and derived timeline points. Generated only in `astro dev` or when
+ * `DEBUG_PAGES=1` is set for a build — never part of the published site. Not user-facing, so labels are not
+ * translated (English, like other developer tooling).
+ */
+import { getCollection, type CollectionKey } from 'astro:content';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import { loadContent } from '~/lib/content/raw';
+import { buildGraph, keyOf, timelinePoints, transfersFor, type Entity } from '~/lib/content/relations';
+import { collectionNames } from '~/lib/content/schemas';
+import { formatPartialDate } from '~/lib/dates';
+
+export function getStaticPaths() {
+  const enabled = import.meta.env.DEV || process.env.DEBUG_PAGES === '1';
+  return enabled ? [{ params: { page: 'content' } }] : [];
+}
+
+const graph = buildGraph(loadContent());
+const astroCounts = Object.fromEntries(
+  await Promise.all(
+    collectionNames.map(async (name) => [name, (await getCollection(name as CollectionKey)).length] as const),
+  ),
+);
+const byCollection = collectionNames.map((name) => ({
+  name,
+  entities: [...graph.entities.values()].filter((e) => e.collection === name),
+}));
+const points = timelinePoints(graph);
+const date = (e: Pick<Entity, 'date'>) => (e.date ? formatPartialDate(e.date, 'ru') : '');
+---
+
+<BaseLayout title="Content debug" noindex>
+  <main id="main" class="debug" lang="en">
+    <h1>Content debug</h1>
+    <p>
+      Collections read from <code>content/</code> by the relations graph, compared with Astro's content layer.
+    </p>
+
+    <h2>Collections</h2>
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">collection</th>
+          <th scope="col">graph</th>
+          <th scope="col">astro</th>
+        </tr>
+      </thead>
+      <tbody>
+        {byCollection.map(({ name, entities }) => (
+          <tr class:list={{ mismatch: entities.length !== astroCounts[name] }}>
+            <td>
+              <a href={`#${name}`}>{name}</a>
+            </td>
+            <td>{entities.length}</td>
+            <td>{astroCounts[name]}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
+    <h2>Broken references ({graph.broken.length})</h2>
+    {graph.broken.length === 0 ? (
+      <p>None.</p>
+    ) : (
+      <ul>
+        {graph.broken.map((b) => (
+          <li>
+            {b.from} → {b.to} ({b.rel})
+          </li>
+        ))}
+      </ul>
+    )}
+
+    {byCollection.map(({ name, entities }) => (
+      <section id={name}>
+        <h2>
+          {name} ({entities.length})
+        </h2>
+        {entities.map((entity) => {
+          const groups = transfersFor(graph, entity);
+          return (
+            <details id={keyOf(entity).replace('/', '--')}>
+              <summary>
+                <code>{entity.id}</code> — <span lang="ru">{entity.title}</span> <small>{date(entity)}</small>
+                <small> · {groups.reduce((n, g) => n + g.entities.length, 0)} transfers</small>
+              </summary>
+              {groups.length === 0 ? (
+                <p>No transfers.</p>
+              ) : (
+                <dl>
+                  {groups.map((g) => (
+                    <>
+                      <dt>{g.collection}</dt>
+                      <dd>
+                        {g.entities.map((e, i) => (
+                          <>
+                            {i > 0 && ', '}
+                            <a href={`#${keyOf(e).replace('/', '--')}`} lang="ru">
+                              {e.title}
+                            </a>
+                          </>
+                        ))}
+                      </dd>
+                    </>
+                  ))}
+                </dl>
+              )}
+            </details>
+          );
+        })}
+      </section>
+    ))}
+
+    <section id="timeline-points">
+      <h2>Timeline points ({points.length})</h2>
+      <ol>
+        {points.map((p) => (
+          <li>
+            <code>{p.date}</code> {p.rail}/{p.kind} — <span lang="ru">{p.title}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  </main>
+</BaseLayout>
+
+<style>
+  .debug {
+    max-inline-size: 70rem;
+    margin-inline: auto;
+    padding: var(--space-m);
+    font-size: var(--fs-meta);
+  }
+  table {
+    border-collapse: collapse;
+  }
+  th,
+  td {
+    padding: var(--space-3xs) var(--space-s);
+    text-align: start;
+  }
+  .mismatch {
+    outline: 2px solid var(--focus);
+  }
+  details {
+    padding-block: var(--space-3xs);
+  }
+  dl {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: var(--space-3xs) var(--space-m);
+    margin-inline-start: var(--space-l);
+  }
+  dt {
+    font-family: var(--font-tape);
+  }
+</style>

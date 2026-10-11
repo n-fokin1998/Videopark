@@ -7,7 +7,8 @@ A digital archive and musical memorial for «Станция Видеопарк»
   Design: [docs/design.md](docs/design.md) · Plan: [docs/roadmap.md](docs/roadmap.md)
 - Source research (RU): [content/knowlage-base/](content/knowlage-base/)
 
-Status: phase 0 (foundations) done — the empty line of stations is walkable. Next: phase 1, content model & ingestion.
+Status: phases 0–1 done — the empty line of stations is walkable and all owner content is modelled and validated
+(`pnpm validate:content`; developer view at `/debug/content` in `pnpm dev`). Next: phase 2, platform, navigation and the player.
 
 ```bash
 pnpm install

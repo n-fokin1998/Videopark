@@ -1,0 +1,17 @@
+# TODO(content): kind/date/event inferred from the YouTube title only — confirm with the owner.
+title: Станция Видеопарк в «Клише»
+sourceTitle: Станция Видеопарк @ Клише
+kind: concert
+event:
+  name: OMUT 02/04
+  venue: klishe
+provider: youtube
+id: jhXHV4rKaLo
+credit:
+  role: источник
+  name: YouTube
+certainty: probable
+sources:
+  - title: "YouTube: Станция Видеопарк @ Клише"
+    url: https://www.youtube.com/watch?v=jhXHV4rKaLo
+    note: OMUT 02/04

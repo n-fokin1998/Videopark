@@ -1,0 +1,7 @@
+# TODO(content): recording date and release unknown; shown in «Отдельные песни».
+song: po-drugomu
+version: studio
+duration: "2:14"
+audio:
+  file: Отдельные/По другому.flac
+certainty: probable

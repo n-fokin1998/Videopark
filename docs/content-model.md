@@ -1,7 +1,17 @@
 # Content model
 
-All content is static, versioned in git under `content/`, loaded with Astro's Content Layer (`glob()` / `file()` loaders) and validated
-by Zod schemas in `src/content.config.ts`. The schemas are the contract: if content doesn't validate, the build fails.
+All content is static, versioned in git under `content/`, loaded with Astro's Content Layer (`glob()` / `file()` loaders plus a small
+`yamlListLoader` for per-year timeline files) and validated by Zod schemas. The schemas are the contract: if content doesn't validate, the build fails.
+
+- **One contract, two readers.** Schemas are defined once in `src/lib/content/schemas.ts` as `defineSchemas(ref, image)`.
+  `src/content.config.ts` instantiates them with Astro's `reference()`/`image()` (rich entries for pages); `src/lib/content/raw.ts` instantiates them
+  with plain strings (ids, relative paths) for the relations graph, unit tests and `scripts/validate-content.ts`, which run outside Astro.
+- **Entry ids are file names** (already Latin slugs, §5) — no slugger rewriting. Albums use their folder name; timeline and Instagram items carry `id`.
+- **Lyrics and writings bodies are plain text, not Markdown**: render the raw body with preserved line breaks (`white-space: pre-line`), never
+  through the Markdown pipeline (it would turn `- …` dialogue into lists and `***` into rules).
+- **Dates in YAML are quoted** (`"2016-08"`, durations `"3:16"`) so no YAML 1.1 parser turns them into Date objects or base-60 numbers.
+- **Internal notes:** `# TODO(content): …` YAML comments mark gaps for the owner (counted by `validate-content`). Photos are shown as provided, regardless of content (owner decision, issue J).
+- **Duplicates:** a media file uploaded under several releases is **one recording** referenced by every release that contains it (owner decision, content-inventory issues A, B, I); the extra copies go to `content/unused-media.yaml`.
 
 Source material: `content/knowlage-base/` (Russian research notes: `biography.md`, `releases.md`, `interview.md`). It is **input** for
 authoring the collections below, never rendered directly.
@@ -38,7 +48,8 @@ const credit     = z.object({ role: z.string(), name: z.string(), person: refere
 ```
 
 Build rule: entries with `rights.status: 'hidden'` (owner asked to keep a file out for now) are **not rendered**;
-`validate-content.ts` reports missing `credit`/`alt` and media files in `content/` that no entry references.
+`validate-content.ts` reports missing media and media files in `content/` that no entry references — except files listed with a reason in
+`content/unused-media.yaml` (e.g. byte-identical duplicates of another upload).
 
 ## 3. Collections
 
@@ -56,7 +67,7 @@ Build rule: entries with `rights.status: 'hidden'` (owner asked to keep a file o
 | `catalog` | string? | «RPS131» |
 | `tracks` | ref(recordings)[] | Ordered tracklist; may be empty with `tracklistKnown: false` |
 | `tracklistKnown` | boolean | `false` for «Мой милый дом» |
-| `cover` | image() ? | Via `astro:assets` |
+| `cover` | image() ? | Via `astro:assets`. Owner covers are attached to the archival (Bandcamp) edition; an original without its own cover may fall back to the edition whose `reissueOf` points at it |
 | `credits` | credit[] | Cover art: Данил Манжос, Дима Комаров… |
 | `links` | `{ bandcamp?, soundcloud?, appleMusic?, other?[] }` | |
 | `era` | ref(eras) | |
@@ -75,6 +86,7 @@ Build rule: entries with `rights.status: 'hidden'` (owner asked to keep a file o
 | `coverOf` | `{ artist: string, title: string }`? | «Гриптэйп» (электроребята) |
 | `themes` | enum[] | `вода, дождь, лес, весна, вечер, ночь, сны, окна, фонари, дом, город, время, отношения…` (fixed vocabulary in schema) |
 | `lyricsStatus` | `'complete' \| 'partial' \| 'missing' \| 'instrumental'` | |
+| `lyricsFile` | string? | Owner file in `content/lyrics/` the body was copied from; `validate-content` checks the body is still identical |
 | `instrumental` | boolean | |
 | `certainty`, `sources` | | |
 | body | markdown | **Lyrics**, verbatim; stanzas separated by blank lines. Translations live in sibling files (see [i18n.md](i18n.md)) |
@@ -83,14 +95,14 @@ Build rule: entries with `rights.status: 'hidden'` (owner asked to keep a file o
 
 | Field | Type | Notes |
 |---|---|---|
-| `song` | ref(songs) | |
+| `song` | ref(songs)? | Required, except for `version: full-release` (a whole release in one file has no single song) |
 | `title` | string? | Override if it differs on the release («33 / 37» vs «33 шага / 37 минут», «Будни (instrumental)») |
 | `version` | `'studio' \| 'live' \| 'demo' \| 'instrumental' \| 'intro' \| 'full-release'` | `full-release` = a whole release in one file («Мой милый дом», 24:12) |
 | `chapters` | `{ t: number, title: string }[]`? | Optional markers inside a `full-release` file if the tracklist is ever restored |
 | `recorded` | partialDate? + `place` | |
-| `duration` | string `m:ss`? | |
-| `audio` | `{ file?: string, soundcloud?: url, bandcamp?: url, rights }` | Resolver order: file → soundcloud → link |
-| `peaks` | string? | Path to generated peaks json |
+| `duration` | string `m:ss`? | Measured from the master with ffprobe when a file exists |
+| `audio` | `{ file?: string, soundcloud?: url, bandcamp?: url, rights }` | `file` is relative to `content/tracks/`; its web version is `public/media/audio/<id>.m4a`. Resolver order: file → soundcloud → link |
+| `peaks` | string? | Optional override; by convention `public/media/audio/<id>.peaks.json` (generated by `pnpm media`) |
 | `syncedLyrics` | `{ t: number, line: number }[]`? | Optional timestamps for synced highlight |
 | `performers` | credit[] | «Женя Мычак — голос, гитара, компьютер» |
 
@@ -99,7 +111,8 @@ Songs known only from concert videos («Я включаю электричест
 without recordings, linked from `videos.songs`.
 
 ### `eras` — `content/eras/<slug>.md`
-`title` (localized), `from`, `to` (partialDate), `summary`, `palette` hint (optional per-era accent shift), `cover` image; body = era essay.
+`title` (localized), `from`, `to?` (partialDate), `summary` (localized), `palette?` hint (optional per-era accent shift), `cover?` image; body = era essay (RU).
+Each release has one `era`: the era its **release date** falls in (an archival 2020 edition of 2016 songs sits in `2020-vne-vremeni` or `posle`).
 Planned: `2014-2016-nachalo`, `2017-moi-milyi-dom`, `2018-videopark`, `2019-raw-pop-syndicate`, `2020-vne-vremeni`, `posle`.
 
 ### `timeline` — `content/timeline/<year>.yaml` (list per year)
@@ -118,7 +131,7 @@ Derived at build: releases add `recorded` and `released` points automatically.
 The **name-origin scene** that opens История (Гидропарк → Видеопарк) is authored as `content/pages/name-origin.ru.md`
 (paraphrase + verbatim quotes from the «Сторона» interview, `sources` pointing to `interviews/storona`), not as a timeline event.
 
-Timeline events also carry `kind` (`life | concert | rehearsal | writing`) and optional `videos` refs. Concerts and rehearsals come from the
+Timeline events also carry `kind` (`life | concert | rehearsal | writing | press`) and optional `videos` refs. Concerts and rehearsals come from the
 uploaded video list (e.g. More Music Club, Odessa, 23.06.2018; Powerhouse, Moscow, 13.06.2019; «Волна-2», Moscow, 10.08.2019), with the
 video as `sources`.
 
@@ -138,28 +151,33 @@ There is **no `exhibits` collection**: no photos of the instruments exist, so th
 
 ### `places` — `content/places/<slug>.yaml`
 `name` (localized), `kind` (`city | street | home | metro | nature | venue`), `coords?` (only for public places — **never the family home**),
-`description`, `photos?`, `songs?`. Seed: Бровары, станция метро «Гидропарк», Киев, Санкт-Петербург (label city — context only).
+`within?` (ref to the containing place: venue → city), `description?` (localized). Photos, videos and songs link *to* places, not the other way round. Seed: Бровары, станция метро «Гидропарк», Киев, Санкт-Петербург (label city — context only).
 
 ### `quotes` — `content/quotes/<slug>.yaml`
-`text` (original RU verbatim), `translations?` (localized, labelled), `source` (sourceRef — e.g. interview «Сторона»), `context?`, `featured` (boolean for platform rotation).
+`text` (original RU verbatim), `translations?` (localized, labelled), `source` (sourceRef — e.g. interview «Сторона»), `interview?` (ref),
+`context?`, `featured` (boolean for platform rotation), `certainty`.
 
 ### `photos` — albums in `content/photos/<album>/album.yaml` + image files
-Album: `title`, `period?`, `source` (`family | friends | band | instagram | press | covers`), `photos: [{ file, caption?, alt, date?, place?, people?, credit, rights, songs?, featured? }]`.
+Album: `title`, `period?`, `source` (`family | friends | band | instagram | press | covers`), `order`, `photos: [{ file, caption?, alt, date?, place?, people?, credit, rights, songs?, featured?, hero? }]`.
+`hero: true` marks photos ≥ 1600 px that work large. The covers album has no `album.yaml`: it is derived from `releases.cover` + credits.
+An album may be filled from Instagram: «Плёнка, 2016» (`photos/plyonka-2016/album.yaml`) has no files of its own — the post with
+`album: plyonka-2016` supplies them.
 `alt` is required. Images are owner-provided; note anything special about private people in `rights.note`.
 Year folders (`2016/` … `2020/`) become period albums. `portraits/` contains **copies** of photos that already live in year folders — it is a
 selection, not an album: those photos get `featured: true` (used for the platform and biography), duplicates are not rendered twice.
 
 ### `videos` — `content/videos/<slug>.yaml`
-`title`, `kind` (`clip | concert | rehearsal | home | tribute | interview`), `date?`, `event?` (`{ name, venue?, city?, date? }`),
-`provider` (`youtube | vimeo | local | mixcloud`), `id`/`file`, `poster` (image; for YouTube a locally stored frame or a designed placeholder —
-never hot-linked thumbnails), `captions?` (VTT path), `duration?`, `songs?`, `credit`, `rights`.
+`title`, `sourceTitle?` (verbatim title on YouTube), `kind` (`clip | concert | rehearsal | home | tribute | interview | other`), `date?`,
+`event?` (`{ name, venue?: ref(places), city?: ref(places), date? }`), `provider` (`youtube | vimeo | local | mixcloud`), `id` / `file` (local file
+relative to `content/videos/`), `poster?` (image; for YouTube a locally stored frame or a designed placeholder — never hot-linked thumbnails;
+local clips get a generated frame `public/media/video/<id>.jpg`), `captions?` (VTT path), `duration?`, `songs?`, `credit`, `rights`, `certainty`.
 Generated from `content/videos/links.txt` (pipe table: title | description | link) + local files.
 
 ### `instagram` — `content/instagram/posts.yaml` + `content/instagram/media/*`
 A **curated list of specific posts** from [instagram.com/evgeniymychak](https://www.instagram.com/evgeniymychak) (no account access, no API).
 The owner maintains `content/instagram/posts.txt` (pipe table: № | date | caption | link); the agent converts it to `posts.yaml`.
-Each item: `permalink` (required, **tracking parameters stripped** — keep only `https://www.instagram.com/p/<id>/`), `date?`, `caption?` (verbatim),
-`media: [{ file, type: 'image' | 'video', alt }]` (files `media/<post>_<n>.<ext>`), `credits?` (photographers named in captions, e.g. `@fastfoodculture`),
+Each item: `id` (the post shortcode), `permalink` (required, **tracking parameters stripped** — keep only `https://www.instagram.com/p/<id>/`), `date?`, `caption?` (verbatim),
+`media: [{ file, type: 'image' | 'video', alt, duration? }]` (files `media/<post>_<n>.<ext>`; videos are git-ignored and copied to `public/media/instagram/` by `pnpm media`), `credits?` (photographers named in captions, e.g. `@fastfoodculture`),
 `album?` (to also show it inside a photo album), `songs?`. Loaded via `file()` loader.
 If `media` is empty, the card shows a text-only teaser with the link (and an optional click-to-load original embed — see integrations).
 
@@ -170,7 +188,9 @@ Long-form singletons: `zhenya` (biography), `name-origin` (История openin
 `raw-pop-syndicate`, `vne-vremeni`, `avgust-2020`, `muzyka-prodolzhaetsya`) for deep links (`/zhenya#poeziya`).
 
 ### `interview` — `content/interviews/storona.md`
-The «Сторона» interview as structured Q/A (`turns: [{ speaker: 'Сторона' | 'Женя', text }]`), with source and date if known.
+The «Сторона» interview as structured Q/A: `title`, `publisher`, `person` (ref), `date?`, `url?`,
+`turns: [{ speaker: 'interviewer' | 'subject', text }]` (display labels come from UI strings) and `corrections: [{ original, corrected }]` listing the
+plain-typo fixes allowed by the editorial guidelines («Густные» → «Грустные», a Latin «C» in «Cтанция»), so every edit stays visible.
 
 ## 4. Relations
 

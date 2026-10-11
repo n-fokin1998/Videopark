@@ -1,0 +1,20 @@
+title: Автоответчик
+sourceTitle: Станция Видеопарк - Автоответчик
+kind: concert
+date: "2018-06-23"
+event:
+  name: Концерт в More Music Club
+  venue: more-music-club
+  city: odesa
+  date: "2018-06-23"
+provider: youtube
+id: xhBBjXbSKq4
+songs:
+  - avtootvetchik
+credit:
+  role: источник
+  name: YouTube
+sources:
+  - title: "YouTube: Станция Видеопарк - Автоответчик"
+    url: https://www.youtube.com/watch?v=xhBBjXbSKq4
+    note: Концерт в More Music Club 23.06.2018, Одесса

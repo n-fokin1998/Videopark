@@ -1,0 +1,16 @@
+# NOTE: treated as a live version of «Куда бы мы не отправились» (issue G).
+song: kuda-by-my-ne-otpravilis
+title: Куда бы мы с тобой не отправились
+version: live
+recorded:
+  from: "2019-06-16"
+duration: "3:33"
+audio:
+  file: RAW STUFF VOL. 5/Куда бы мы с тобой не отправились.flac
+performers:
+  - role: голос, гитара, компьютер
+    name: Женя Мычак
+    person: zhenya-mychak
+sources:
+  - title: Raw Pop Syndicate — «RAW STUFF VOL. 5»
+    url: https://rawpopsyndicate.bandcamp.com/album/raw-stuff-vol-5

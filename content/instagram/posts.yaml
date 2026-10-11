@@ -1,0 +1,91 @@
+# Curated posts from instagram.com/evgeniymychak (D-016), converted from posts.txt; tracking parameters stripped.
+# Media files: media/<post number in posts.txt>_<n>.<ext>. Captions are verbatim.
+- id: CCoqArZJ4ZR
+  permalink: https://www.instagram.com/p/CCoqArZJ4ZR/
+  date: "2020-07-14"
+  caption: Четыре года назад я чё-то пытался фоткать на батину Смену и вот в 2020 плёнка проявлена, историческая телега так-то
+  media:
+    - type: image
+      file: ./media/1_1.jpg
+      alt: "Чёрно-белое плёночное фото: человек идёт по обочине широкой улицы с машиной, впереди многоэтажка"
+    - type: image
+      file: ./media/1_2.jpg
+      alt: "Чёрно-белое плёночное фото: край кровати со смятым покрывалом, рядом стол, бутылка воды и обогреватель"
+    - type: image
+      file: ./media/1_3.jpg
+      alt: "Чёрно-белое плёночное фото: молодой человек в профиль курит у окна"
+    - type: image
+      file: ./media/1_4.jpg
+      alt: "Чёрно-белое плёночное фото: молодой человек с длинными волосами улыбается на сельской дороге у домов"
+    - type: image
+      file: ./media/1_5.jpg
+      alt: "Чёрно-белое плёночное фото: кудрявый молодой человек в комбинезоне распахивает куртку, во внутреннем кармане флакон"
+    - type: image
+      file: ./media/1_6.jpg
+      alt: "Чёрно-белое плёночное фото: молодой человек в куртке с тёмной бутылкой в руке у окна"
+    - type: image
+      file: ./media/1_7.jpg
+      alt: "Чёрно-белое плёночное фото: юноша без футболки в квартире, на плече ремень фотоаппарата с надписью «ЗЕНИТ»"
+  credits:
+    - role: фото
+      name: Женя Мычак
+      person: zhenya-mychak
+  album: plyonka-2016
+- id: CCVLcycp6bZ
+  permalink: https://www.instagram.com/p/CCVLcycp6bZ/
+  date: "2020-07-07"
+  caption: ok computer
+  media:
+    - type: video
+      file: ./media/2_1.mp4
+      alt: "Видео со стилизацией под VHS: двое музыкантов с гитарами играют на сцене под белым тентом, впереди буквы-подушки и гирлянды"
+      duration: "0:26"
+    - type: image
+      file: ./media/2_2.jpg
+      alt: Молодой человек в футболке делает селфи в зеркале на телефон, за спиной окно с листвой
+- id: CCS8tw5p5d8
+  permalink: https://www.instagram.com/p/CCS8tw5p5d8/
+  date: "2020-07-06"
+  caption: Станция Видеопарк и друзья гешефт двадцатьдвадцать
+  media:
+    - type: image
+      file: ./media/3_1.jpg
+      alt: "Плёночное фото: шестеро молодых людей со стаканами у белого фургона под деревьями, летний день"
+- id: CBzxblSJ7YZ
+  permalink: https://www.instagram.com/p/CBzxblSJ7YZ/
+  date: "2020-06-24"
+  caption: Мой хороший друг Витя
+  media:
+    - type: image
+      file: ./media/4_1.jpg
+      alt: Рука с татуировкой держит чёрного котёнка на фоне светлой стены
+- id: CAr0ZqlJwRc
+  permalink: https://www.instagram.com/p/CAr0ZqlJwRc/
+  date: "2020-05-27"
+  caption: 📸@fastfoodculture
+  media:
+    - type: image
+      file: ./media/5_1.jpg
+      alt: Молодой человек в белой футболке с рюкзаком стоит на трибуне стадиона, позади беговые дорожки и многоэтажки
+  credits:
+    - role: фото
+      name: "@fastfoodculture"
+- id: CABVEmmJkAr
+  permalink: https://www.instagram.com/p/CABVEmmJkAr/
+  date: "2020-05-10"
+  caption: Чикиряп нау, девчурочки!
+  media:
+    - type: image
+      file: ./media/6_1.jpg
+      alt: "Чёрно-белое фото: молодой человек в светлой кепке «MCMXCV» и тёмном свитшоте на вечерней площади с фонарями"
+- id: B-ngFZZpLXx
+  permalink: https://www.instagram.com/p/B-ngFZZpLXx/
+  date: "2020-04-06"
+  caption: Скоро будем дома 📸 @zav1z1on
+  media:
+    - type: image
+      file: ./media/7_1.jpg
+      alt: "Чёрно-белое фото: молодой человек в белой футболке поёт, держа микрофон у лица, справа пустая стойка"
+  credits:
+    - role: фото
+      name: "@zav1z1on"

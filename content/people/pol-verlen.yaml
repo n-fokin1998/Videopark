@@ -1,0 +1,9 @@
+name:
+  ru: Поль Верлен
+  en: Paul Verlaine
+role: poet
+bio:
+  ru: Французский поэт-символист. Женя называл французский символизм среди любимой поэзии.
+sources:
+  - title: Интервью Жени Мычака издательству «Сторона»
+    note: content/interviews/storona.md

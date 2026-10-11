@@ -1,0 +1,14 @@
+- id: rozhdenie
+  date: "1999"
+  rail: life
+  title:
+    ru: Родился Женя Мычак
+  text:
+    ru: Евгений Мычак родился в 1999 году и жил в Броварах.
+  links:
+    people:
+      - zhenya-mychak
+    places:
+      - brovary
+  sources:
+    - title: Сведения, предоставленные владельцем проекта

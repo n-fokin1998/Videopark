@@ -1,0 +1,17 @@
+# TODO(content): kind/date/event inferred from the YouTube title only — confirm with the owner.
+title: Залив (Рыцарь Диких Яблок cover)
+sourceTitle: Станция Видеопарк - Залив (15.04.17)
+kind: other
+date: "2017-04-15"
+provider: youtube
+id: xySCIDPMTVU
+songs:
+  - zaliv
+credit:
+  role: источник
+  name: YouTube
+certainty: probable
+sources:
+  - title: "YouTube: Станция Видеопарк - Залив (15.04.17)"
+    url: https://www.youtube.com/watch?v=xySCIDPMTVU
+    note: Рыцарь Диких Яблок cover

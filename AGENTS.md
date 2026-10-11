@@ -70,9 +70,9 @@ pnpm format         # prettier --write
 pnpm test           # vitest
 pnpm test:e2e       # playwright (+ axe)
 pnpm lighthouse     # Lighthouse budgets against pnpm preview (local, reports in .lighthouseci/)
-pnpm validate:content  # (phase 1) relations, credits, alt text, unreferenced media, certainty report
-pnpm verify         # full local quality gate: lint, check, test, build, e2e + axe, lighthouse
-pnpm media          # (phase 1) optimise media, generate waveforms (scripts/)
+pnpm validate:content  # broken refs, missing/unreferenced media, verbatim lyrics, certainty & TODO(content) report
+pnpm verify         # full local quality gate: lint, check, test, validate:content, build, e2e + axe, lighthouse
+pnpm media          # needs ffmpeg: FLAC → AAC + waveform peaks, video posters, EXIF report → public/media/ (git-ignored)
 ```
 
 Before declaring a task done, run `pnpm check && pnpm lint && pnpm test` (and `pnpm test:e2e` for UI changes).

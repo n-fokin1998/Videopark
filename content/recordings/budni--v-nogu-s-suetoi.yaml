@@ -1,0 +1,7 @@
+# NOTE: «Хорошее время/Будни.flac» is byte-identical to this file (issue B); the EP track references this recording.
+song: budni
+title: Будни (instrumental)
+version: instrumental
+duration: "3:27"
+audio:
+  file: В ногу с суетой/Будни (Instrumental).flac

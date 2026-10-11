@@ -1,0 +1,21 @@
+- id: stikhi-i-proza-2014
+  date: "2014-01"
+  rail: life
+  kind: writing
+  title:
+    ru: Стихи и короткая проза
+  text:
+    ru: В январе 2014 года Женя пишет стихи «Странник», «Иногда я задаюсь вопросом...» и короткую прозу «Она» и «Ожидание».
+  sources:
+    - title: Тексты из архива проекта
+      note: content/knowlage-base/стихи.txt, проза.txt
+- id: pervaya-gruppa
+  date: "2014"
+  rail: life
+  certainty: probable
+  title:
+    ru: Первая группа
+  text:
+    ru: Примерно в 2014 году Женя всерьёз занимается музыкой и входит в свою первую группу.
+  sources:
+    - title: "База знаний проекта: biography.md"

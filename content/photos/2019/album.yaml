@@ -1,0 +1,61 @@
+# TODO(content): captions (place, people, photographer) — add notes.md to this folder (roadmap Q11).
+# Credit «Архив проекта» until the photographers are known. `featured` = copied by the owner into portraits/.
+title:
+  ru: "2019"
+period:
+  from: "2019"
+source: band
+order: 2019
+photos:
+  - file: ./4mpJicVvdKUyqXyGAY2cyrKskvWuuw1FExXJoiyMvHKrKGQ7V7lf-TpSUxOqmlO1BYPww6vBZNLCRQ.jpg
+    alt: "Чёрно-белое фото: молодой человек в белой футболке поёт, держа микрофон у лица, справа пустая стойка"
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+    featured: true
+  - file: ./8LenMtUEE4IjheH5-H0OECtjJTizpbx8G4FsXKQyMlZNhFJWkQ-aXxcePywz3IpuYpWQIw2t.jpg
+    alt: Двое парней поют в один микрофон, у одного белая электрогитара, слева барабанная установка
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./Bt86GneR7S56qBSBtZjXCJEGs4bmeGRozgcd2N3F5URqSx9-nrOpjQYS74DocFjqM6GXuwBy00f5FQ.jpg
+    alt: "Плёночное фото ночью: двое парней у белой стены во дворе, один в клетчатой рубашке показывает жест рукой"
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./JWu5XodwMx6pjExLrJNlipxXdHC3hOPkz_qG88l7IVdeRbC9VQHEeo86a-erhbG5OdipA7nf.jpg
+    alt: Трое молодых людей сидят на диване за тёмным столом в кафе с кирпичным сводом и розовой подсветкой
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./KYS_u42I13jJw26ok7aV2_yqHLldxznFY-tSTLYps3qnc5D2DW9udUt4nWzKHlr7Dnui6cRs.jpg
+    alt: Девушка и молодой человек поют в микрофоны на тёмной сцене в тёплом оранжевом свете
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./aJlzS9ZvNgTm-DdfA0kRpGjdxcEukNkSawk6OZ9kp_Q3wdXQaiwabQ4Srbdk9T2qxYEdtfYWX83bWQ.jpg
+    alt: Молодой человек в чёрной футболке поёт в микрофон и играет на белой электрогитаре, снимок снизу
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./dHTrZrvGmTQCcHjKwQPE7qnoq-7XFJGG7RnU3IArlTuafNNpauS7onz6_O8YNyI7aHTwIBo1ZxltEq9d2uRpG815.jpg
+    alt: "Плёночное фото: двое парней за столом в полутёмном кафе, кадр по краям перекрыт тёмным предметом"
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./q6rfKhGQHHYqH-R_Z8zMaPbUmKCYxpGkm9ejRFiNVWa48dwxfSblNV5lq2p3Zm0yEdb6o0Pj.jpg
+    alt: "Плёночное фото ночью: трое молодых людей во дворе, один в кожаном плаще и кепке, другой в шортах и сандалиях"
+    date: "2019"
+    credit:
+      role: фото
+      name: Архив проекта

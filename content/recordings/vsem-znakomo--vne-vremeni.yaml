@@ -1,0 +1,12 @@
+song: vsem-znakomo
+version: studio
+recorded:
+  from: "2020-03"
+  to: "2020-04"
+  place: brovary
+duration: "3:04"
+audio:
+  file: Вне времени/Всем знакомо.flac
+sources:
+  - title: Raw Pop Syndicate — «Вне времени»
+    url: https://rawpopsyndicate.bandcamp.com/album/ep-16

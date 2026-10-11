@@ -1,0 +1,22 @@
+# TODO(content): captions (place, people, photographer) — add notes.md to this folder (roadmap Q11).
+# Credit «Архив проекта» until the photographers are known. `featured` = copied by the owner into portraits/.
+title:
+  ru: "2018"
+period:
+  from: "2018"
+source: band
+order: 2018
+photos:
+  - file: ./06AChjYSbcbIsluME2xjVlksZSmOlWoQJoEvUGCUR_k9lEwQ8KarToeKe1eeoNff3qK2Jky8cxbtAA.jpg
+    alt: "Чёрно-белое фото: трое молодых людей и девушка в студии на фоне колонок, справа стоит бас-гитара"
+    date: "2018"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./X75R8NuqKK_8BWuOr31xzTyeLPxMs_e8hgICTgprhnYELmCyl7_WQRjK_86Oy8ehejDIp3Wk.jpg
+    alt: Молодой человек с электрогитарой на фоне проекции видео с водоёмом, впереди силуэты зрителей
+    date: "2018"
+    credit:
+      role: фото
+      name: Архив проекта

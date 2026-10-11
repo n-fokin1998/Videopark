@@ -1,0 +1,20 @@
+title: Я включаю электричество
+sourceTitle: Станция Видеопарк - Я Включаю Электричество
+kind: concert
+date: "2018-06-23"
+event:
+  name: Концерт в More Music Club
+  venue: more-music-club
+  city: odesa
+  date: "2018-06-23"
+provider: youtube
+id: wggG75gJoLw
+songs:
+  - ya-vklyuchayu-elektrichestvo
+credit:
+  role: источник
+  name: YouTube
+sources:
+  - title: "YouTube: Станция Видеопарк - Я Включаю Электричество"
+    url: https://www.youtube.com/watch?v=wggG75gJoLw
+    note: Концерт в More Music Club 23.06.2018, Одесса

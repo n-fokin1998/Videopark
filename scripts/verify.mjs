@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Local quality gate (roadmap phase 0; hosted CI comes in phase 9):
- * lint → check → unit tests → build → Playwright e2e + axe → Lighthouse.
+ * lint → check → unit tests → content validation → build → Playwright e2e + axe → Lighthouse.
  * Stops at the first failing step. Extra env (e.g. E2E_SKIP_FIREFOX=1) is passed through.
  */
 import { spawnSync } from 'node:child_process';
@@ -10,6 +10,7 @@ const steps = [
   ['lint', 'pnpm lint'],
   ['check', 'pnpm check'],
   ['unit tests', 'pnpm test'],
+  ['content', 'pnpm validate:content'],
   ['build', 'pnpm build'],
   ['e2e + axe', 'pnpm test:e2e', { E2E_SKIP_BUILD: '1' }],
   ['lighthouse', 'pnpm lighthouse'],

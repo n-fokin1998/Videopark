@@ -1,0 +1,77 @@
+- id: videopark
+  date: "2018-02-02"
+  rail: life
+  kind: press
+  title:
+    ru: «Видеопарк»
+  text:
+    ru: Сообщая о выходе «Моего милого дома», Neformat называет проект «Видеопарк (раньше — Станция Видеопарк)».
+  links:
+    releases:
+      - moi-milyi-dom
+    people:
+      - neformat
+  sources:
+    - title: "Neformat: «Видеопарк випустив новий альбом», 02.02.2018"
+      url: https://www.neformat.com.ua/ua/news/16447-videopark-vipustiv-novii-albom.html
+- id: repetitsiya-odesa-2018
+  date: "2018-02-15"
+  rail: life
+  kind: rehearsal
+  title:
+    ru: Репетиция в More Music Club, Одесса
+  links:
+    songs:
+      - les
+    places:
+      - more-music-club
+      - odesa
+  videos:
+    - les-repetitsiya-more-music-club-2018
+  sources:
+    - title: "YouTube: Станция Видеопарк - Лес (15.02.18)"
+      note: content/videos/les-repetitsiya-more-music-club-2018.yaml
+- id: mini-albom-5
+  date: "2018-04-30"
+  rail: released
+  kind: press
+  certainty: probable
+  title:
+    ru: Мини-альбом «5»
+  text:
+    ru: "Neformat сообщает о мини-альбоме «5»: «Приходить к тебе», «Я бездельник и дома своего я раб», «Весна», «Лес», «Нет ничего проще». Вероятно, это сборка уже записанных песен."
+  links:
+    songs:
+      - prikhodit-k-tebe
+      - ya-bezdelnik-i-doma-svoego-ya-rab
+      - vesna
+      - les
+      - net-nichego-proshche
+    people:
+      - neformat
+  sources:
+    - title: "Neformat: «Проект Станция Видеопарк випустив новий міні-альбом», 30.04.2018"
+      url: https://www.neformat.com.ua/news/16956-proekt-stantsiya-videopark-vipustiv-novii-mini-albom.html
+- id: more-music-club-2018
+  date: "2018-06-23"
+  rail: life
+  kind: concert
+  title:
+    ru: Концерт в More Music Club, Одесса
+  links:
+    songs:
+      - 21-marta
+      - ya-vklyuchayu-elektrichestvo
+      - avtootvetchik
+      - northern-sun
+    places:
+      - more-music-club
+      - odesa
+  videos:
+    - 21-marta-more-music-club-2018
+    - ya-vklyuchayu-elektrichestvo-more-music-club-2018
+    - avtootvetchik-more-music-club-2018
+    - northern-sun-more-music-club-2018
+  sources:
+    - title: "YouTube: Станция Видеопарк - 21 Марта"
+      note: content/videos/21-marta-more-music-club-2018.yaml

@@ -1,0 +1,44 @@
+# TODO(content): captions (place, people, photographer) — add notes.md to this folder (roadmap Q11).
+# Credit «Архив проекта» until the photographers are known. `featured` = copied by the owner into portraits/.
+title:
+  ru: "2020"
+period:
+  from: "2020"
+source: band
+order: 2020
+photos:
+  - file: ./4bakBaebxjTCWmN-eUqvAB6zkC3vQTGmsfvj5cE0D633h_RkOK2clNBJqmRX-L7Q5i52GVhs.jpg
+    alt: "Чёрно-белое фото: молодой человек в светлой кепке «MCMXCV» и тёмном свитшоте на вечерней площади с фонарями"
+    date: "2020"
+    credit:
+      role: фото
+      name: Архив проекта
+    featured: true
+    hero: true
+  - file: ./8DiJ38w_pQvkoD_LwCkqc-j7pyiMpndcBFc44Pmx5CQtaVvr5pkTBjaIy8ltzrNVQ69djNmD5ILPhg.jpg
+    alt: "Чёрно-белое плёночное фото: двое парней сидят на диване, у одного белая электрогитара с кабелем"
+    date: "2020"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true
+  - file: ./JeB_vfDgCoVXTli2Gl2HF3m5Tz2ahLtO9kNehn89irg2l2f0WwyAWcpMx_SJQ8CCi8s8ZEZJwzADeic1gOX9lMjfXIZ_ZQ.jpg
+    alt: "Плёночное фото: молодой человек в бордовой куртке и с рюкзаком держит в руках две белые коробки"
+    date: "2020"
+    credit:
+      role: фото
+      name: Архив проекта
+  - file: ./bnjkb54j3b6j543b6jk3546534nj6n354j6n.png
+    alt: Молодой человек в белой футболке с рюкзаком стоит на трибуне стадиона, позади беговые дорожки и многоэтажки
+    date: "2020"
+    credit:
+      role: фото
+      name: Архив проекта
+    featured: true
+  - file: ./u0HjdgVzH9SQAvU80ystj9uGPI_qO5Z19MK8DVOyrD51iaessS1ldPTrFs-RUVqFa7Ef9caI.jpg
+    alt: Трое молодых людей стоят в высокой траве у жилого дома солнечным летним днём
+    date: "2020"
+    credit:
+      role: фото
+      name: Архив проекта
+    hero: true

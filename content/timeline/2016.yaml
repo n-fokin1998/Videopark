@@ -1,0 +1,17 @@
+- id: osnovanie
+  date: "2016"
+  rail: life
+  title:
+    ru: Появляется «Станция Видеопарк»
+  text:
+    ru: После «Грустных товарищей» Женя хочет сделать что-то более целостное — так в Броварах появляется «Станция Видеопарк».
+  links:
+    places:
+      - brovary
+    people:
+      - zhenya-mychak
+      - aleksei-dyachkov
+  sources:
+    - title: Интервью Жени Мычака издательству «Сторона»
+      note: content/interviews/storona.md
+    - title: "База знаний проекта: biography.md"

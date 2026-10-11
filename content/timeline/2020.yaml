@@ -1,0 +1,26 @@
+- id: plyonka-2016
+  date: "2020-07-14"
+  rail: life
+  title:
+    ru: Проявлена плёнка 2016 года
+  text:
+    ru: "Женя выкладывает фотографии, которые снял в 2016 году на «Смену»: плёнку проявили только в 2020-м."
+  links:
+    photos:
+      - plyonka-2016
+  sources:
+    - title: Instagram, 14.07.2020
+      url: https://www.instagram.com/p/CCoqArZJ4ZR/
+- id: avgust-2020
+  date: "2020-08-02"
+  rail: life
+  title:
+    ru: 2 августа 2020 года
+  text:
+    ru: 2 августа 2020 года Жени не стало. Ему был 21 год. В конце июля он попал в автомобильную аварию.
+  links:
+    people:
+      - zhenya-mychak
+  sources:
+    - title: Сведения, предоставленные владельцем проекта
+    - title: "База знаний проекта: biography.md"
