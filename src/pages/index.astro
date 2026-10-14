@@ -1,13 +1,219 @@
 ---
-/** Платформа — the arrival. Phase 2 adds the wordmark, the silent arrival sequence and the track of the evening. */
-import StationLayout from '~/layouts/StationLayout.astro';
-import StationPlaceholder from '~/components/station/StationPlaceholder.astro';
-import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+/**
+ * Платформа — the arrival (docs/information-architecture.md §1, §5). The server renders the platform state:
+ * the lit wordmark over the platform scene, «Трек вечера», the line as the main navigation, one quote and a few
+ * photo fragments. The silent arrival sequence is an overlay on top (progressive enhancement, first visit only).
+ */
+import { Picture } from 'astro:assets';
+import BaseLayout from '~/layouts/BaseLayout.astro';
+import Arrival from '~/components/station/Arrival.astro';
+import LineDiagram from '~/components/station/LineDiagram.astro';
+import NextStation from '~/components/station/NextStation.astro';
+import PlatformScene from '~/components/station/PlatformScene.astro';
+import Wordmark from '~/components/station/Wordmark.astro';
+import Quote from '~/components/ui/Quote.astro';
+import TrackOfTheEvening from '~/components/player/TrackOfTheEvening.svelte';
+import { defaultLocale, isLocale, localizedPath, strings, useTranslations } from '~/i18n';
+import { getEveningTracks } from '~/lib/content/catalog';
+import { getFeaturedPhotos, getFeaturedQuotes } from '~/lib/content/queries';
+import { formatPartialDate } from '~/lib/dates';
+import { localDateKey, pickIndexForDate } from '~/lib/evening';
+import { getStation } from '~/lib/stations';
 
 const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
 const t = useTranslations(locale);
+const station = getStation('platform');
+
+// Server picks for the build date; the client switches to the visitor's date (src/lib/evening.ts).
+const today = localDateKey(new Date());
+const eveningTracks = await getEveningTracks(locale);
+const eveningIndex = eveningTracks.length > 0 ? pickIndexForDate(today, eveningTracks.length, 'track') : 0;
+const eveningTrack = eveningTracks[eveningIndex];
+const quotes = await getFeaturedQuotes();
+const quoteIndex = quotes.length > 0 ? pickIndexForDate(today, quotes.length, 'quote') : 0;
+const photos = await getFeaturedPhotos(3);
+const playerStrings = strings(locale, 'player');
 ---
 
-<StationLayout station="platform" heading={t('site.name')} label={t('station.platform.name')} title={null}>
-  <StationPlaceholder />
-</StationLayout>
+<BaseLayout
+  description={t(station.descriptionKey)}
+  station="platform"
+  preloadFonts={['sign']}
+  announce={t('a11y.stationAnnounce', { name: t(station.nameKey) })}
+>
+  <Arrival slot="overlay" />
+
+  <section slot="hero" class="hero">
+    <PlatformScene class="hero__scene" />
+    <div class="wrap hero__inner">
+      <p class="hero__label meta">{t(station.nameKey)}</p>
+      <Wordmark as="h1" variant="stacked" lit class="hero__wordmark" />
+    </div>
+  </section>
+
+  {eveningTrack && (
+    <section class="block evening" aria-label={playerStrings.eveningLabel}>
+      <TrackOfTheEvening
+        client:idle
+        initial={eveningTrack}
+        initialIndex={eveningIndex}
+        count={eveningTracks.length}
+        source={localizedPath('/tracks/evening.json', locale)}
+        labels={{
+          eveningLabel: playerStrings.eveningLabel,
+          eveningNote: playerStrings.eveningNote,
+          playTrack: playerStrings.playTrack,
+          pauseTrack: playerStrings.pauseTrack,
+        }}
+      />
+    </section>
+  )}
+
+  <nav class="block" aria-labelledby="platform-line">
+    <h2 id="platform-line">{t('platform.lineHeading')}</h2>
+    <LineDiagram locale={locale} current="platform" labelledBy="platform-line" />
+  </nav>
+
+  {quotes.length > 0 && (
+    <section class="block" aria-labelledby="platform-quote">
+      <h2 id="platform-quote" class="visually-hidden">
+        {t('platform.quoteHeading')}
+      </h2>
+      <div data-daily="quote">
+        {quotes.map((quote, i) => (
+          <Quote quote={quote} hidden={i !== quoteIndex} data-daily-item />
+        ))}
+      </div>
+    </section>
+  )}
+
+  {photos.length > 0 && (
+    <section class="block" aria-labelledby="platform-photos">
+      <h2 id="platform-photos" class="meta">
+        {t('platform.photosHeading')}
+      </h2>
+      <ul role="list" class="frames">
+        {photos.map(({ photo }) => (
+          <li class="frame">
+            <Picture
+              src={photo.file}
+              alt={photo.alt}
+              widths={[240, 360, 480, 720]}
+              sizes="(width >= 960px) 22rem, (width >= 640px) 30vw, 80vw"
+              formats={['avif', 'webp']}
+              loading="lazy"
+              fetchpriority="low"
+              decoding="async"
+            />
+            {photo.date && (
+              <span class="frame__rec meta" aria-hidden="true">
+                {t('platform.rec', { date: formatPartialDate(photo.date, locale) })}
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
+      <p>
+        <a href={localizedPath(getStation('photos').path, locale)}>{t('platform.photosMore')}</a>
+      </p>
+    </section>
+  )}
+
+  <NextStation slot="footer" station="platform" locale={locale} />
+</BaseLayout>
+
+<script>
+  import '~/scripts/daily';
+</script>
+
+<style>
+  @layer components {
+    .hero {
+      position: relative;
+      display: grid;
+      min-block-size: clamp(22rem, 62svh, 44rem);
+      overflow: hidden;
+      isolation: isolate;
+    }
+
+    .hero :global(.hero__scene) {
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+
+    /* Fade the scene into the page below. */
+    .hero::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: 0;
+      block-size: 30%;
+      background: linear-gradient(to bottom, transparent, var(--bg));
+      z-index: -1;
+    }
+
+    .hero__inner {
+      display: grid;
+      align-content: center;
+      justify-items: start;
+      gap: var(--space-s);
+      padding-block: var(--space-xl) 28%;
+    }
+
+    .hero__inner :global(.hero__wordmark) {
+      --wm-size: clamp(3.25rem, 1.8rem + 7vw, 8rem);
+    }
+
+    .block {
+      display: grid;
+      gap: var(--space-m);
+      padding-block: var(--space-xl);
+    }
+
+    .evening {
+      padding-block-start: var(--space-l);
+      max-inline-size: 44rem;
+    }
+
+    .frames {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+      gap: var(--space-s);
+    }
+
+    .frame {
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-s);
+      background: var(--bg-raised);
+    }
+
+    .frame :global(img) {
+      inline-size: 100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+    }
+
+    /* A camcorder overlay in the corner, like a date burnt into a home tape. */
+    .frame__rec {
+      position: absolute;
+      inset-block-start: var(--space-2xs);
+      inset-inline-start: var(--space-2xs);
+      padding: 0 var(--space-3xs);
+      background: var(--photo-label-bg);
+      color: var(--photo-label-fg);
+    }
+
+    @media (width >= 960px) {
+      .frames {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      /* Break the grid a little from desktop up: a contact sheet, not a gallery. */
+      .frame:nth-child(2) {
+        translate: 0 var(--space-l);
+      }
+    }
+  }
+</style>

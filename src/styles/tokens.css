@@ -82,9 +82,16 @@
     --dur-long: 800ms;
     --dur-slow: 1400ms;
     --dur-reduced: 150ms;
+    /* The arrival (≈ 2 s on desktop, ≤ 2.5 s budget on phones — design.md §6) */
+    --dur-arrival-train: 1000ms;
+    --dur-arrival-doors: 800ms;
     --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
     --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
     --ease-in: cubic-bezier(0.55, 0, 1, 0.45);
+
+    /* Labels burnt into photos (camcorder date overlay): the same in every theme. */
+    --photo-label-fg: var(--c-paper);
+    --photo-label-bg: color-mix(in srgb, var(--c-night) 65%, transparent);
 
     /* Layers */
     --z-base: 0;
@@ -93,6 +100,7 @@
     --z-overlay: 30;
     --z-grain: 40;
     --z-toast: 50;
+    --z-arrival: 55;
     --z-skip: 60;
   }
 
@@ -100,6 +108,8 @@
   @media (width < 640px) {
     :root {
       --dur-long: 500ms;
+      --dur-arrival-train: 750ms;
+      --dur-arrival-doors: 550ms;
     }
   }
 }

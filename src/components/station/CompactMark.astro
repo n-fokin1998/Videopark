@@ -1,0 +1,72 @@
+---
+/**
+ * The compact mark (docs/design.md §5): the red-line station dot with «В» inside — for tight spaces (site header on
+ * phones, favicon). The «В» is drawn as paths, so it does not depend on a web font. `public/favicon.svg` is the same
+ * drawing with fixed evening colours. Labelled by `<title>` unless `decorative`.
+ */
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+
+interface Props {
+  size?: number;
+  decorative?: boolean;
+}
+
+const { size = 44, decorative = false } = Astro.props;
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<svg
+  class="mark"
+  width={size}
+  height={size}
+  viewBox="0 0 64 64"
+  role={decorative ? undefined : 'img'}
+  aria-hidden={decorative ? 'true' : undefined}
+  focusable="false"
+>
+  {!decorative && <title>{t('site.name')}</title>}
+  <rect class="mark__line" x="2" y="30" width="60" height="4" rx="2" />
+  <circle class="mark__dot" cx="32" cy="32" r="19" />
+  <path class="mark__letter" d="M26 21.5v21 M26 21.5h6.5a5 5 0 0 1 0 10H26 M26 31.5h7.5a5.5 5.5 0 0 1 0 11H26" />
+</svg>
+
+<style>
+  @layer components {
+    .mark {
+      flex: none;
+    }
+
+    .mark__line {
+      fill: var(--line);
+    }
+
+    .mark__dot {
+      fill: var(--bg);
+      stroke: var(--line);
+      stroke-width: 4.5;
+    }
+
+    .mark__letter {
+      fill: none;
+      stroke: var(--accent);
+      stroke-width: 3.6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    @media (forced-colors: active) {
+      .mark__line {
+        fill: CanvasText;
+      }
+
+      .mark__dot {
+        stroke: CanvasText;
+      }
+
+      .mark__letter {
+        stroke: CanvasText;
+      }
+    }
+  }
+</style>

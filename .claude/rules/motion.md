@@ -15,11 +15,14 @@ Spec: [docs/design.md §7 Motion](../../docs/design.md#7-motion), §9 Sound.
 1. CSS transitions/animations with motion tokens.
 2. View Transitions (`astro:transitions`, `::view-transition-*` CSS) for page and shared-element changes.
 3. CSS scroll-driven animations (`animation-timeline: view()`), wrapped in `@supports`.
-4. **GSAP** (+ ScrollTrigger / SplitText) for orchestrated sequences: arrival, timeline, multi-step reveals.
+4. **GSAP** (+ ScrollTrigger / SplitText) for orchestrated sequences: name-origin scene, timeline, multi-step reveals. (The arrival is
+   CSS keyframes switched by classes — `src/scripts/arrival.ts`; no GSAP needed so far.)
 5. WebGL (OGL) only for the water shader on the platform and in Evening mode.
 
 ## Rules
-- GSAP and plugins are **dynamically imported** via `src/lib/motion.ts` (`loadGsap()`), never in the global bundle. Register plugins once.
+- GSAP and plugins are **dynamically imported** via `src/lib/motion.ts` (add `loadGsap()` there with the first GSAP sequence), never in the global bundle. Register plugins once.
+- Keep the number of captured view-transition layers small: animate small elements inside the static header snapshot rather than
+  giving them their own `view-transition-name` (e.g. the travelling dot of the line indicator, FLIP in `src/scripts/navigation.ts`).
 - Wrap GSAP work in `gsap.context()` / `gsap.matchMedia()` and revert it on `astro:before-swap` / component destroy.
 - **Reduced motion is mandatory:** `gsap.matchMedia()` with `(prefers-reduced-motion: reduce)` → crossfades ≤ 150 ms, no parallax,
   no scroll-linked transforms, static grain, no shader, arrival shows the final state immediately. CSS: global `@media (prefers-reduced-motion: reduce)` override in `motion.css`.

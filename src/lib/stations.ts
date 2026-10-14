@@ -23,6 +23,8 @@ export type Station = {
   kind: StationKind;
   nameKey: TranslationKey;
   descriptionKey: TranslationKey;
+  /** A few words under the station name in the line map. */
+  taglineKey: TranslationKey;
   /** Stations reachable by transfer from this one, shown in the next-station footer. */
   transfers: readonly StationId[];
 };
@@ -34,6 +36,7 @@ function station(id: StationId, path: string, kind: StationKind, transfers: read
     kind,
     nameKey: `station.${id}.name`,
     descriptionKey: `station.${id}.description`,
+    taglineKey: `station.${id}.tagline`,
     transfers,
   };
 }
@@ -82,7 +85,7 @@ export function stationForPath(pathname: string): Station | undefined {
   return stations.find((s) => s.path !== '/' && (path === s.path || path.startsWith(`${s.path}/`)));
 }
 
-export type TransitionDirection = 'forward' | 'back' | 'none';
+export type TransitionDirection = 'forward' | 'back' | 'none' | 'map';
 
 /**
  * Direction of travel between two pages: forward/back along the line, `none` (crossfade) for jumps involving
@@ -96,4 +99,14 @@ export function transitionDirection(fromPathname: string, toPathname: string): T
   const toIndex = lineIndex(to.id);
   if (fromIndex === undefined || toIndex === undefined) return 'none';
   return toIndex > fromIndex ? 'forward' : 'back';
+}
+
+/** A jump chosen on the line map zooms into the target instead of sliding (docs/information-architecture.md §4). */
+export function navigationDirection(
+  fromPathname: string,
+  toPathname: string,
+  { viaLineMap = false }: { viaLineMap?: boolean } = {},
+): TransitionDirection {
+  if (viaLineMap && stationForPath(fromPathname)?.id !== stationForPath(toPathname)?.id) return 'map';
+  return transitionDirection(fromPathname, toPathname);
 }

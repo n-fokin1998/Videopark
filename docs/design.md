@@ -119,7 +119,8 @@ The main logo is the band name, crafted with care — **not** the Г→В gag (t
   `--dur-slow`, then settles. No flicker, no glitch. Static under reduced motion.
 - **Variants:** horizontal (header, desktop), stacked «Станция / Видеопарк» (platform hero, mobile), compact mark — the red-line dot with
   «СВ» or a single «В» inside — for favicon, app icon and tight spaces. Monochrome paper-on-dusk and ink-on-paper versions.
-- **Rules:** never distorted, never shown in the «Гидропарк» form outside История, clear space = height of «В». SVG with `<title>` for screen readers.
+- **Rules:** never distorted, never shown in the «Гидропарк» form outside История, clear space = height of «В». The lettering is live text (crisp, selectable, read as «Станция Видеопарк»); stripe and dot are
+  decorative. The compact mark is an SVG drawn with paths (no font dependency) with `<title>`, also used as `public/favicon.svg` (D-026).
 - Latin form for future EN: «Videopark Station» in the same construction; the Cyrillic wordmark stays primary in all locales.
 
 ### The name-origin scene (История)
@@ -242,7 +243,8 @@ Sound is part of the identity, but **never forced**.
 - Ambient/UI sounds are controlled by a separate «Звук» toggle (in «Схема» and the player), **default off**, persisted.
 - When «Звук» is on: optional, very quiet ambient bed per station (platform hum, Brovary field recordings), ducked to silence when music plays;
   at most a soft passing train on station change.
-- UI sounds: at most a soft click for play/pause. Volume ≤ −24 LUFS relative.
+- UI sounds: at most a soft click for play/pause — synthesised with Web Audio (≈ 60 ms, very quiet), so no asset is downloaded.
+  Volume ≤ −24 LUFS relative. Ambient beds wait for owner-provided recordings.
 - Music fades in/out over 300 ms on play/pause; crossfade between queue items optional (default off, songs are short and intimate).
 
 ## 10. Iconography & illustration

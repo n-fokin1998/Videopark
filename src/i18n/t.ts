@@ -1,5 +1,8 @@
 import { defaultLocale, type Locale } from './config';
+import { interpolate, type TranslationParams } from './format';
 import { ru, type Dictionary } from './ui/ru';
+
+export type { TranslationParams };
 
 /** Dot-separated paths to every string leaf of the dictionary, e.g. `station.music.name`. */
 export type TranslationKey = Leaves<Dictionary>;
@@ -7,8 +10,6 @@ export type TranslationKey = Leaves<Dictionary>;
 type Leaves<T, Prefix extends string = ''> = {
   [K in keyof T & string]: T[K] extends string ? `${Prefix}${K}` : Leaves<T[K], `${Prefix}${K}.`>;
 }[keyof T & string];
-
-export type TranslationParams = Record<string, string | number>;
 
 const dictionaries: Record<Locale, Dictionary | undefined> = {
   ru,
@@ -25,19 +26,16 @@ function lookup(dictionary: Dictionary, key: string): string | undefined {
   return typeof node === 'string' ? node : undefined;
 }
 
-function interpolate(template: string, params?: TranslationParams): string {
-  if (!params) return template;
-  return template.replace(/\{(\w+)\}/g, (match, name: string) => {
-    const value = params[name];
-    return value === undefined ? match : String(value);
-  });
-}
-
 /** Translate `key` for `locale`, falling back to the default locale. Throws on an unknown key (build-time safety). */
 export function translate(locale: Locale, key: TranslationKey, params?: TranslationParams): string {
   const value = lookup(dictionaries[locale] ?? ru, key) ?? lookup(dictionaries[defaultLocale] ?? ru, key);
   if (value === undefined) throw new Error(`i18n: missing key "${key}" for locale "${locale}"`);
   return interpolate(value, params);
+}
+
+/** A whole namespace of the dictionary (e.g. `player`), passed as props to islands — see `./format.ts`. */
+export function strings<K extends keyof Dictionary>(locale: Locale, namespace: K): Dictionary[K] {
+  return (dictionaries[locale] ?? ru)[namespace];
 }
 
 export function useTranslations(locale: Locale = defaultLocale) {

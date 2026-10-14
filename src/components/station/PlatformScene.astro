@@ -1,0 +1,149 @@
+---
+/**
+ * The platform illustration (docs/design.md §10, Q8 default: code-drawn SVG). An evening metro platform seen from
+ * the platform edge: the tiled far wall, columns, ceiling lamps, the track pit and the amber edge line.
+ * Flat, few colours, all from semantic tokens — so it recolours with the time-of-day theme. Purely decorative.
+ * Layered (`.scene__lamps`, `.scene__wall`…) so parts can be animated; the lamps glow softly, statically.
+ */
+interface Props {
+  class?: string | undefined;
+  /** Prefix for gradient ids — unique per instance on a page (the arrival overlay and the hero both draw the scene). */
+  idPrefix?: string;
+}
+
+const { class: className, idPrefix = 'scene' } = Astro.props;
+const glowId = `${idPrefix}-lamp-glow`;
+const floorId = `${idPrefix}-floor`;
+const columns = [140, 520, 1080, 1460];
+const lamps = [80, 330, 580, 830, 1080, 1330, 1580];
+const tiles = Array.from({ length: 11 }, (_, i) => 150 + i * 36);
+---
+
+<svg
+  class:list={['scene', className]}
+  viewBox="0 0 1600 900"
+  preserveAspectRatio="xMidYMax slice"
+  aria-hidden="true"
+  focusable="false"
+>
+  <defs>
+    <radialGradient id={glowId}>
+      <stop offset="0" class="scene__glow-core" />
+      <stop offset="1" class="scene__glow-edge" />
+    </radialGradient>
+    <linearGradient id={floorId} x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" class="scene__floor-top" />
+      <stop offset="1" class="scene__floor-bottom" />
+    </linearGradient>
+  </defs>
+
+  <!-- Far wall with tile courses -->
+  <g class="scene__wall">
+    <rect x="0" y="120" width="1600" height="440" />
+    {tiles.map((y) => (
+      <line x1="0" x2="1600" y1={y} y2={y} />
+    ))}
+  </g>
+
+  <!-- The red line along the wall, like the stripe of the wordmark -->
+  <rect class="scene__stripe" x="0" y="470" width="1600" height="8" />
+
+  <!-- Ceiling and lamps -->
+  <rect class="scene__ceiling" x="0" y="0" width="1600" height="120" />
+  <g class="scene__lamps">
+    {lamps.map((x) => (
+      <g>
+        <circle cx={x} cy="132" r="120" fill={`url(#${glowId})`} />
+        <rect class="scene__lamp" x={x - 46} y="108" width="92" height="10" rx="5" />
+      </g>
+    ))}
+  </g>
+
+  <!-- Track pit and rails -->
+  <rect class="scene__pit" x="0" y="560" width="1600" height="90" />
+  <line class="scene__rail" x1="0" x2="1600" y1="598" y2="598" />
+  <line class="scene__rail" x1="0" x2="1600" y1="622" y2="622" />
+
+  <!-- Platform floor, edge line -->
+  <rect x="0" y="650" width="1600" height="250" fill={`url(#${floorId})`} />
+  <rect class="scene__edge" x="0" y="650" width="1600" height="7" />
+
+  <!-- Columns in the foreground -->
+  <g class="scene__columns">
+    {columns.map((x) => (
+      <rect x={x - 34} y="0" width="68" height="900" />
+    ))}
+  </g>
+</svg>
+
+<style>
+  @layer components {
+    .scene {
+      display: block;
+      inline-size: 100%;
+      block-size: 100%;
+    }
+
+    .scene__wall rect {
+      fill: color-mix(in srgb, var(--bg-raised) 70%, var(--sky-top));
+    }
+
+    .scene__wall line {
+      stroke: color-mix(in srgb, var(--border) 60%, transparent);
+      stroke-width: 1.5;
+    }
+
+    .scene__stripe {
+      fill: color-mix(in srgb, var(--line) 75%, transparent);
+    }
+
+    .scene__ceiling {
+      fill: color-mix(in srgb, var(--bg) 70%, var(--sky-top));
+    }
+
+    .scene__glow-core {
+      stop-color: var(--accent);
+      stop-opacity: 0.35;
+    }
+
+    .scene__glow-edge {
+      stop-color: var(--accent);
+      stop-opacity: 0;
+    }
+
+    .scene__lamp {
+      fill: color-mix(in srgb, var(--accent) 70%, var(--paper));
+    }
+
+    .scene__pit {
+      fill: color-mix(in srgb, var(--bg) 75%, var(--shadow));
+    }
+
+    .scene__rail {
+      stroke: color-mix(in srgb, var(--fg-muted) 45%, transparent);
+      stroke-width: 3;
+    }
+
+    .scene__floor-top {
+      stop-color: var(--bg-raised);
+    }
+
+    .scene__floor-bottom {
+      stop-color: var(--bg);
+    }
+
+    .scene__edge {
+      fill: color-mix(in srgb, var(--accent) 65%, transparent);
+    }
+
+    .scene__columns rect {
+      fill: color-mix(in srgb, var(--bg) 80%, var(--sky-top));
+    }
+
+    @media (prefers-contrast: more) {
+      .scene__lamps {
+        display: none;
+      }
+    }
+  }
+</style>

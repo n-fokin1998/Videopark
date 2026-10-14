@@ -20,6 +20,7 @@
     --on-paper: var(--c-ink);
     --sky-top: var(--c-twilight);
     --sky-bottom: var(--c-dusk);
+    --shadow: color-mix(in srgb, var(--c-night) 55%, transparent);
   }
 
   [data-theme='night'] {
@@ -37,6 +38,7 @@
     --on-paper: var(--c-ink);
     --sky-top: #141a26;
     --sky-bottom: var(--c-night);
+    --shadow: color-mix(in srgb, var(--c-night) 80%, transparent);
   }
 
   [data-theme='dawn'] {
@@ -54,6 +56,7 @@
     --on-paper: var(--c-ink);
     --sky-top: #c9d3e6;
     --sky-bottom: #efe8e6;
+    --shadow: color-mix(in srgb, #4f5568 30%, transparent);
   }
 
   [data-theme='day'] {
@@ -71,5 +74,6 @@
     --on-paper: var(--c-ink);
     --sky-top: #d3d6da;
     --sky-bottom: #e6e4df;
+    --shadow: color-mix(in srgb, #4c525c 30%, transparent);
   }
 }

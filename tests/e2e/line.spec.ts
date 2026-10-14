@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import type { Page } from '@playwright/test';
+import { expect, test } from './fixtures';
 import { escapeRegExp, lineStations, ru, stationName, trackMediaPlay } from './helpers';
 
 const nextLink = (page: Page) => page.getByRole('link', { name: escapeRegExp(ru.line.next) });
