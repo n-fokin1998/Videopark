@@ -10,6 +10,7 @@ import {
   stationForPath,
   stations,
   transitionDirection,
+  navigationDirection,
 } from './stations';
 
 describe('station registry', () => {
@@ -112,5 +113,23 @@ describe('transitionDirection', () => {
     expect(transitionDirection('/history', '/zhenya')).toBe('none');
     expect(transitionDirection('/about', '/')).toBe('none');
     expect(transitionDirection('/nowhere', '/music')).toBe('none');
+  });
+});
+
+describe('navigationDirection', () => {
+  it('zooms for jumps chosen on the line map', () => {
+    expect(navigationDirection('/', '/brovary', { viaLineMap: true })).toBe('map');
+    expect(navigationDirection('/', '/zhenya', { viaLineMap: true })).toBe('map');
+  });
+
+  it('slides along the line otherwise, and never zooms within one station', () => {
+    expect(navigationDirection('/', '/music')).toBe('forward');
+    expect(navigationDirection('/music', '/music', { viaLineMap: true })).toBe('none');
+  });
+});
+
+describe('station strings', () => {
+  it('has a tagline for every station', () => {
+    for (const station of stations) expect(translate('ru', station.taglineKey)).not.toBe('');
   });
 });

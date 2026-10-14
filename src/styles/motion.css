@@ -2,7 +2,9 @@
  * Motion (docs/design.md §7) and station-to-station view transitions (information-architecture.md §4).
  * html[data-direction] is set by src/scripts/navigation.ts from the station registry:
  *   forward → content leaves left / enters from the right (a train leaving); back → mirrored; none → crossfade.
- * The `station` view-transition name is on <main>; the header (`line`) never animates out.
+ *   map → a jump from the line map («Схема»): a short zoom + crossfade.
+ * The `station` view-transition name is on <main>; the header (`line`) and the player never animate out
+ * (the lit dot of the line indicator travels inside the header — see LineIndicator.astro).
  */
 @layer base {
   @keyframes vt-fade-out {
@@ -73,9 +75,35 @@
     animation: vt-enter-left var(--dur-long) var(--ease-out) both;
   }
 
-  /* The line indicator and (later) the player stay put. */
+  /* A jump chosen on the line map: the old station recedes as if the map zooms into the target, then a crossfade. */
+  @keyframes vt-zoom-out {
+    to {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+  }
+
+  @keyframes vt-zoom-in {
+    from {
+      opacity: 0;
+      transform: scale(0.97);
+    }
+  }
+
+  html[data-direction='map']::view-transition-old(station) {
+    animation: vt-zoom-out calc(var(--dur-long) * 0.5) var(--ease-in) both;
+  }
+
+  html[data-direction='map']::view-transition-new(station) {
+    animation: vt-zoom-in var(--dur-long) var(--ease-out) both;
+  }
+
+  /* The line indicator and the player stay put. */
   ::view-transition-old(line),
-  ::view-transition-new(line) {
+  ::view-transition-new(line),
+  ::view-transition-group(player),
+  ::view-transition-old(player),
+  ::view-transition-new(player) {
     animation: none;
   }
 
@@ -87,6 +115,10 @@
       animation-iteration-count: 1 !important;
       transition-duration: var(--dur-reduced) !important;
       scroll-behavior: auto !important;
+    }
+
+    ::view-transition-group(*) {
+      animation-duration: var(--dur-reduced) !important;
     }
 
     ::view-transition-old(*),

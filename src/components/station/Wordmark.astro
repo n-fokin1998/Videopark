@@ -1,0 +1,160 @@
+---
+/**
+ * The wordmark «Станция Видеопарк» (docs/design.md §5, D-012): a station name plate on the red line.
+ * «Станция» is the small tracked label, «Видеопарк» the large name; a thin red stripe runs under the name
+ * (horizontal) or beside it (stacked) and ends in the station dot of the line indicator — logo and navigation are one system.
+ * The lettering is live text (crisp at any size, selectable, read by screen readers and search as the band name);
+ * stripe and dot are decorative. The compact mark (dot + «В», favicon) is `CompactMark.astro` / `public/favicon.svg`.
+ * `lit`: the wordmark switches on like a station lamp (amber glow over --dur-slow, then settles; static under reduced motion).
+ */
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+
+interface Props {
+  variant?: 'horizontal' | 'stacked';
+  /** Element to render: `h1` for the platform hero, `span` inside links. */
+  as?: 'h1' | 'p' | 'span';
+  lit?: boolean;
+  class?: string | undefined;
+}
+
+const { variant = 'horizontal', as: Tag = 'span', lit = false, class: className } = Astro.props;
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<Tag
+  class:list={['wordmark', `wordmark--${variant}`, { 'is-lit': lit }, className]}
+  tabindex={Tag === 'h1' ? '-1' : undefined}
+>
+  <span class="wordmark__label">{t('wordmark.label')}</span> <span class="wordmark__name">{t('wordmark.name')}</span>
+  <span class="wordmark__stripe" aria-hidden="true"></span>
+  <span class="wordmark__dot" aria-hidden="true"></span>
+</Tag>
+
+<style>
+  @layer components {
+    .wordmark {
+      /* Size is set by the parent through --wm-size (default: the station-sign size). */
+      --_size: var(--wm-size, var(--fs-station));
+      --wm-stroke: max(var(--line-stroke), calc(var(--_size) * 0.04));
+      --wm-dot: max(var(--dot-size), calc(var(--_size) * 0.2));
+
+      position: relative;
+      display: inline-grid;
+      justify-items: start;
+      font-family: var(--font-sign);
+      color: var(--fg);
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .wordmark__label {
+      font-size: max(var(--fs-meta), calc(var(--_size) * 0.2));
+      font-weight: 500;
+      letter-spacing: var(--tracking-label);
+      text-transform: uppercase;
+      color: var(--fg-muted);
+    }
+
+    /* Golos, heavier, with slightly open tracking: a sign drawn by a person rather than a corporate logotype. */
+    .wordmark__name {
+      font-size: var(--_size);
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+
+    .wordmark__stripe,
+    .wordmark__dot {
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .wordmark__stripe {
+      background: var(--line);
+      border-radius: var(--radius-round);
+    }
+
+    .wordmark__dot {
+      inline-size: var(--wm-dot);
+      block-size: var(--wm-dot);
+      border: var(--wm-stroke) solid var(--line);
+      border-radius: var(--radius-round);
+      background: var(--bg);
+    }
+
+    /* Horizontal: label above; the stripe under the name ends in the dot on the right. */
+    .wordmark--horizontal {
+      gap: calc(var(--_size) * 0.08);
+      padding-block-end: calc(var(--wm-dot) * 1.1);
+      padding-inline-end: calc(var(--wm-dot) * 0.6);
+    }
+
+    .wordmark--horizontal .wordmark__stripe {
+      inset-inline: 0 calc(var(--wm-dot) / 2);
+      inset-block-end: calc(var(--wm-dot) / 2 - var(--wm-stroke) / 2);
+      block-size: var(--wm-stroke);
+    }
+
+    .wordmark--horizontal .wordmark__dot {
+      inset-inline-end: 0;
+      inset-block-end: 0;
+    }
+
+    /* Stacked: «Станция / Видеопарк»; the stripe runs beside the name, the dot sits level with «Станция». */
+    .wordmark--stacked {
+      gap: calc(var(--_size) * 0.12);
+      padding-inline-start: calc(var(--wm-dot) * 1.6);
+    }
+
+    .wordmark--stacked .wordmark__stripe {
+      inset-inline-start: calc(var(--wm-dot) / 2 - var(--wm-stroke) / 2);
+      inset-block: calc(var(--wm-dot) / 2) 0.08em;
+      inline-size: var(--wm-stroke);
+    }
+
+    .wordmark--stacked .wordmark__dot {
+      inset-inline-start: 0;
+      inset-block-start: 0;
+    }
+
+    /* The station lamp: a warm glow comes up behind the name, then settles. No flicker. */
+    .is-lit .wordmark__name {
+      text-shadow: 0 0 0.35em color-mix(in srgb, var(--accent) 35%, transparent);
+      animation: lamp-on var(--dur-slow) var(--ease-out) both;
+    }
+
+    .is-lit .wordmark__dot {
+      background: var(--accent);
+      box-shadow: 0 0 var(--wm-dot) color-mix(in srgb, var(--accent) 50%, transparent);
+      animation: dot-on var(--dur-slow) var(--ease-out) both;
+    }
+
+    @keyframes lamp-on {
+      from {
+        color: var(--fg-muted);
+        text-shadow: 0 0 0 transparent;
+      }
+
+      60% {
+        text-shadow: 0 0 0.5em color-mix(in srgb, var(--accent) 55%, transparent);
+      }
+    }
+
+    @keyframes dot-on {
+      from {
+        background: var(--bg);
+        box-shadow: none;
+      }
+    }
+
+    @media (forced-colors: active) {
+      .wordmark__stripe {
+        background: CanvasText;
+      }
+
+      .wordmark__dot {
+        border-color: CanvasText;
+      }
+    }
+  }
+</style>

@@ -175,3 +175,47 @@ Format: `## D-NNN — Title` · Status (Proposed / Accepted / Superseded by D-xx
     user-facing, so its labels are English and not in `ru.ts`.
 - **Consequences:** A schema change is made in one place. `public/media/` (≈ 270 MB once generated) is copied into `dist/` by `astro build`;
   where it is served from in production is still the phase 9 decision (D-021).
+
+## D-026 — Phase 2: platform, navigation and player
+- **Status:** Accepted · 2026-10-11
+- **Context:** Roadmap phase 2 (the spine): wordmark, line indicator and map, persistent player, silent arrival, «Звук», track of the
+  evening, time-of-day theming — within the JS budgets and without breaking playback on navigation.
+- **Decision:**
+  - **Wordmark** is live text («Станция» label + «Видеопарк» name, Golos) with a decorative CSS stripe and station dot — crisp at every
+    size, read by screen readers and search as the band name. The **compact mark** (dot + «В») is an SVG drawn with paths (no font
+    dependency); `public/favicon.svg` is the same drawing in evening colours.
+  - **Arrival** is CSS keyframes switched by classes (`src/scripts/arrival.ts`) — no GSAP. The inline pre-paint script sets
+    `html[data-arrival="pending"]` only for a first visit at «/», with JS and without reduced motion (`vp:arrived` in localStorage; any
+    deep-link landing also sets it). While it shows, the rest of the page is `inert`; if the script never starts, the overlay is released
+    after 10 s. Crawlers, no-JS and returning visitors get the server-rendered platform state.
+  - **«Схема»** is a zero-JS native `<dialog>` (focus trap, Esc, inert background) plus a plain script loaded on idle — not a Svelte
+    island. It holds the line diagram, the light (theme pin incl. «По времени суток») and «Звук». Its button stays hidden without JS.
+  - **Player:** the audio engine (one `HTMLAudioElement`, file backend; SoundCloud Widget backend lazy-imported) and `controller.ts`
+    live in module scope, so they survive ClientRouter navigations; the persisted `Player.svelte` is only the UI and hydrates
+    `client:idle` (it renders nothing until there is a queue; this measurably lowered mobile Lighthouse LCP). Its CSS is injected by
+    JS (`<svelte:options css="injected" />`). Queue, index, volume and position persist; a reload restores paused, never playing.
+    Tracks come from a build-time catalog that sets `src` only if `pnpm media` produced the `.m4a`.
+  - **Keyboard:** shortcuts are matched by physical key (`KeyboardEvent.code`), so `M`/`N`/`P` work on the Russian layout.
+  - **Track of the evening / platform quote:** a seeded permutation per cycle of N days (`src/lib/evening.ts`) — every candidate once
+    per cycle, by the visitor's local date. The platform HTML carries only the build-date pick; the island fetches
+    `/tracks/evening.json` only when the visitor's date picks another track.
+  - **Time of day:** the pre-paint script applies a pinned theme or the time-of-day theme before first paint (same table as
+    `src/lib/time-of-day.ts`); `src/scripts/theme.ts` switches at the next boundary. A dark colour-scheme preference maps
+    dawn → night and day → evening.
+  - **UI sound:** the play/pause click is synthesised with Web Audio (no asset). Ambient beds wait for owner recordings.
+  - **Travelling dot** of the line indicator: a FLIP animation inside the static header snapshot (`navigation.ts` measures old/new
+    positions) instead of its own view-transition layer.
+  - **Cascade layers:** the order statement moved from `src/styles/layers.css` to an inline `<style>` at the top of `<head>`. The
+    bundler put component CSS before `main.css` and dropped the bare `@layer` statement, so `components` had been the *weakest* layer
+    since phase 0 (e.g. `reset` beat component sizes).
+  - **New dependency:** `sharp` (Astro's image service, needed now that pages render `astro:assets` images; it was only an optional
+    peer before). Already in the pnpm store as Astro's peer.
+  - **E2E:** every test is a returning visitor (`storageState` sets `vp:arrived`); audio is served as a generated silent WAV, so tests
+    need neither `pnpm media` nor AAC support. Playwright's **WebKit build for Windows crashes when the View Transitions API runs on a
+    scrollable page** (reproduced on master with any page taller than the viewport); there the tests remove `startViewTransition`
+    (Astro falls back to its own animation). Real Safari is checked by hand in the phase 8 QA matrix.
+- **Consequences:** All JS a page loads (incl. the idle-loaded player) is ≈ 39 KB gz on content pages and ≈ 41 KB on the platform
+  (budgets 60/120). Lighthouse mobile
+  LCP is 2.26–2.56 s on content pages (master 2.11 s; the extra «Схема» markup and CSS) and ≈ 2.7 s on the platform — over the 2.5 s
+  budget on some runs; to be fixed in the phase 8 performance pass (candidates: render the «Схема» contents lazily, trim the platform's
+  above-the-fold fonts). The SoundCloud backend is untested until a recording has a SoundCloud URL.

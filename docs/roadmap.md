@@ -60,14 +60,21 @@ After MVP: Видео (music video + 12 concert videos — small enough to ship 
 
 ## Phase 2 — Platform, navigation, player (the spine)
 
-- [ ] Wordmark «Станция Видеопарк» (SVG, variants: horizontal, stacked, compact mark/favicon).
-- [ ] Line indicator (desktop + mobile compact form), line map overlay (keyboard `M`), next-station footer, direction-aware transitions.
-- [ ] Player: store, audio engine, source resolver (file / SoundCloud widget / link), Media Session, persistence, keyboard, mobile layout.
-- [ ] Платформа: SSR platform state; silent arrival sequence (wordmark lamp, train, doors) as progressive enhancement; reduced-motion and mobile versions.
-- [ ] Sound toggle («Звук», default off).
-- [ ] Track of the evening (deterministic by date).
-- [ ] Time-of-day theming.
+- [x] Wordmark «Станция Видеопарк» (variants: horizontal, stacked, compact mark/favicon).
+- [x] Line indicator (desktop + mobile compact form), line map overlay (keyboard `M`), next-station footer, direction-aware transitions.
+- [x] Player: store, audio engine, source resolver (file / SoundCloud widget / link), Media Session, persistence, keyboard, mobile layout.
+- [x] Платформа: SSR platform state; silent arrival sequence (wordmark lamp, train, doors) as progressive enhancement; reduced-motion and mobile versions.
+- [x] Sound toggle («Звук», default off).
+- [x] Track of the evening (deterministic by date).
+- [x] Time-of-day theming.
 - **Done when:** music plays continuously while navigating all stations on desktop + iOS Safari + Android Chrome; arrival is skippable and silent.
+- Status: implemented (VDPRK-3), decisions in D-026. Verified with Playwright on desktop Chromium/WebKit and mobile Chromium/WebKit
+  (portrait + landscape); playback across the whole line is covered by `tests/e2e/player.spec.ts`. Still open:
+  - **Real devices:** iOS Safari and Android Chrome by hand (Playwright's Windows WebKit needs a View Transitions workaround, D-026).
+  - **SoundCloud backend:** implemented but unexercised — no recording has a SoundCloud URL yet (content issue C).
+  - **Ambient sounds:** «Звук» drives only the play/pause click; ambient beds need owner-provided recordings (`TODO(content)`).
+  - **Budgets:** JS is well inside (≈ 39 KB gz on content pages, ≈ 41 KB on the platform, incl. the idle-loaded player); Lighthouse mobile LCP sits at 2.26–2.56 s on
+    content pages (master: 2.11 s) and ≈ 2.7 s on the platform (perf 0.94–0.95) — to be brought under 2.5 s in the phase 8 pass.
 
 ## Phase 3 — Музыка
 

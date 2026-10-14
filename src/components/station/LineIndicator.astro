@@ -1,11 +1,14 @@
 ---
 /**
- * Line indicator (docs/design.md §5): the red line with one dot per station; the current station is lit.
- * Phones show the compact «← prev · current · next →» form; from --bp-lg the whole line is visible.
- * Phase 0 skeleton — the travelling dot and hover labels arrive in phase 2.
+ * Line indicator (docs/design.md §5): the red line with one dot per station; the current station is lit and named.
+ * - Phones (narrow container): the compact «← prev · current · next →» form.
+ * - Wide: the whole line; on hover-capable devices only the current name shows, the others appear on hover/focus
+ *   (touch devices keep every name visible — no hover-only information).
+ * - On a station change the lit dot travels along the line while the rest of the header stays put (navigation.ts).
+ * Off the line (Женя, Об архиве) the compact form shows the transfer stations instead.
  */
 import { localizedPath, useTranslations, type Locale } from '~/i18n';
-import { getStation, isTerminal, lineIndex, lineStations, type StationId } from '~/lib/stations';
+import { getStation, isTerminal, lineIndex, lineStations, neighbours, type StationId } from '~/lib/stations';
 
 interface Props {
   current?: StationId | undefined;
@@ -24,10 +27,11 @@ const near = new Set<StationId>(
       ? getStation(current).transfers
       : lineStations.slice(0, 2).map((s) => s.id),
 );
+const { previous, next } = current ? neighbours(current) : { previous: undefined, next: undefined };
 ---
 
 <nav class="line" aria-label={t('a11y.lineNav')}>
-  <ol role="list" class="line__stations">
+  <ol role="list" class:list={['line__stations', { 'has-current': index !== undefined }]}>
     {lineStations.map((station) => (
       <li
         class:list={[
@@ -35,13 +39,23 @@ const near = new Set<StationId>(
           {
             'is-current': station.id === current,
             'is-near': near.has(station.id),
+            'is-previous': station.id === previous?.id,
+            'is-next': station.id === next?.id,
             'is-terminal': isTerminal(station.id),
           },
         ]}
       >
         <a href={localizedPath(station.path, locale)} aria-current={station.id === current ? 'page' : undefined}>
           <span class="line__dot" aria-hidden="true" />
-          <span class="line__name">{t(station.nameKey)}</span>
+          <span class="line__name">
+            <span class="line__arrow line__arrow--back" aria-hidden="true">
+              ←
+            </span>
+            {t(station.nameKey)}
+            <span class="line__arrow line__arrow--on" aria-hidden="true">
+              →
+            </span>
+          </span>
         </a>
       </li>
     ))}
@@ -52,13 +66,14 @@ const near = new Set<StationId>(
   @layer components {
     .line {
       container: line / inline-size;
+      min-inline-size: 0;
     }
 
     .line__stations {
       position: relative;
       display: flex;
       justify-content: space-between;
-      gap: var(--space-2xs);
+      gap: var(--space-3xs);
     }
 
     /* The red line itself, drawn through the dots. */
@@ -75,6 +90,7 @@ const near = new Set<StationId>(
     .line__station {
       display: none;
       position: relative;
+      min-inline-size: 0;
     }
 
     .line__station.is-near {
@@ -92,10 +108,31 @@ const near = new Set<StationId>(
       color: var(--fg-muted);
       text-decoration: none;
       font-size: var(--fs-ui);
+      line-height: var(--lh-ui);
+    }
+
+    .line__name {
+      display: inline-flex;
+      gap: var(--space-3xs);
+      max-inline-size: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Compact form: arrows point to the neighbours. */
+    .line__arrow {
+      display: none;
+    }
+
+    .has-current .is-previous .line__arrow--back,
+    .has-current .is-next .line__arrow--on {
+      display: inline;
     }
 
     .line__dot {
       display: block;
+      flex: none;
       inline-size: var(--dot-size);
       block-size: var(--dot-size);
       margin-block-start: calc(var(--hit-target) / 2 - var(--dot-size) / 2);
@@ -120,14 +157,57 @@ const near = new Set<StationId>(
       box-shadow: 0 0 0 var(--space-3xs) color-mix(in srgb, var(--line) 30%, transparent);
     }
 
+    /*
+     * The lit dot travels along the line on a station change: navigation.ts measures the old and new positions and
+     * sets --travel (FLIP). Animated inside the static header snapshot rather than as an extra view-transition layer.
+     */
+    .is-current .line__dot.is-travelling {
+      animation: dot-travel var(--dur-long) var(--ease-in-out);
+    }
+
+    @keyframes dot-travel {
+      from {
+        translate: var(--travel, 0) 0;
+      }
+    }
+
     .line__station a:hover {
       color: var(--fg);
     }
 
     /* From --bp-lg the whole line fits. */
-    @container line (width >= 52rem) {
+    @container line (width >= 46rem) {
       .line__station {
         display: block;
+      }
+
+      .line__arrow,
+      .has-current .is-previous .line__arrow--back,
+      .has-current .is-next .line__arrow--on {
+        display: none;
+      }
+    }
+
+    /* Wide, with a real pointer: other names appear on hover/focus (touch keeps them all visible). */
+    @media (hover: hover) and (pointer: fine) {
+      @container line (width >= 46rem) {
+        .line__station:not(.is-current) .line__name {
+          opacity: 0;
+          transform: translateY(calc(-1 * var(--space-3xs)));
+          transition:
+            opacity var(--dur-short) var(--ease-out),
+            transform var(--dur-short) var(--ease-out);
+        }
+
+        .line__station a:hover .line__name,
+        .line__station a:focus-visible .line__name {
+          opacity: 1;
+          transform: none;
+        }
+
+        .line__station a:hover .line__dot {
+          box-shadow: 0 0 0 var(--space-3xs) color-mix(in srgb, var(--line) 20%, transparent);
+        }
       }
     }
 

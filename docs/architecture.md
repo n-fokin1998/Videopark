@@ -19,7 +19,7 @@ Technical blueprint. Product context: [vision.md](vision.md). Rules: [.claude/ru
 | Islands | **Svelte 5** (runes) | Small runtime, great for animated stateful widgets. Used only where state is needed |
 | Shared state | **nanostores** (+ `@nanostores/persistent`) | Framework-agnostic, tiny, works across islands and plain scripts |
 | Page transitions | `astro:transitions` `<ClientRouter />` + View Transitions API | Persistent player via `transition:persist`, shared-element morphs |
-| Motion | **GSAP** (core, ScrollTrigger, SplitText) | Orchestrated sequences (arrival, timeline). Loaded only on pages that need it |
+| Motion | CSS first; **GSAP** (core, ScrollTrigger, SplitText) | Orchestrated sequences (name-origin scene, timeline). Loaded only on pages that need it. The arrival is plain CSS keyframes (D-026) |
 | Smooth scroll | **Lenis** (optional, per page) | Gentle scroll on long stations; disabled under reduced motion and on touch if it harms UX |
 | WebGL (optional) | **OGL** (tiny) for the water shader | Arrival + Evening mode only, lazy, with static fallback |
 | Images | `astro:assets` `<Picture>` (AVIF + WebP + JPEG fallback) | Responsive, optimised at build |
@@ -65,11 +65,11 @@ Any addition to this list requires a [decisions.md](decisions.md) entry.
 │  ├─ content.config.ts           # all collections (loaders); schemas come from lib/content/schemas.ts
 │  ├─ pages/                      # routes (see information-architecture.md §2)
 │  ├─ layouts/
-│  │  ├─ BaseLayout.astro         # <html>, head, theme script, ClientRouter, Player, LineIndicator
+│  │  ├─ BaseLayout.astro         # <html>, head, layer order + pre-paint script, ClientRouter, header (mark, LineIndicator, LineMap), Player
 │  │  └─ StationLayout.astro      # station sign hero, next-station footer, transitions
 │  ├─ components/
-│  │  ├─ station/                 # Wordmark, StationSign, LineIndicator, LineMap(.svelte), NextStation, Arrival, SoundToggle
-│  │  ├─ player/                  # Player.svelte, PlayButton.svelte, Waveform.svelte, store.ts, audio-engine.ts
+│  │  ├─ station/                 # Wordmark, CompactMark, StationSign, LineIndicator, LineMap + LineDiagram, NextStation, Arrival, PlatformScene
+│  │  ├─ player/                  # Player/PlayButton/Waveform/TrackOfTheEvening.svelte, store.ts, controller.ts, audio-engine.ts (+ file/soundcloud backends), peaks.ts, ui-sound.ts
 │  │  ├─ timeline/                # NameOriginScene.astro (Г→В), Timeline.svelte, Rail, EventDot, EraRoom.astro
 │  │  ├─ lyrics/                  # LyricsSheet.astro, SyncedLyrics.svelte, ShareLine.svelte
 │  │  ├─ media/                   # Photo.astro, Gallery.astro, Lightbox.svelte, VideoFacade.astro, SoundCloudEmbed.astro, InstagramCard.astro
@@ -80,9 +80,12 @@ Any addition to this list requires a [decisions.md](decisions.md) entry.
 │  │  ├─ content/                 # schemas.ts (shared Zod contract), raw.ts (fs reader for tests/scripts), relations.ts (graph), loaders.ts
 │  │  ├─ slug.ts                  # Latin transliteration for ids
 │  │  ├─ dates.ts                 # partial dates ("2017", "2017-03"), formatting per locale
-│  │  ├─ time-of-day.ts
+│  │  ├─ time-of-day.ts           # theme schedule, also fed to the pre-paint script
 │  │  ├─ stations.ts              # ordered station registry (single source for nav & transitions)
-│  │  ├─ motion.ts                # reduced-motion helpers, GSAP lazy loader
+│  │  ├─ motion.ts                # reduced-motion and low-end-device helpers (GSAP lazy loader joins with phase 4)
+│  │  ├─ evening.ts               # deterministic daily pick («Трек вечера», the platform quote)
+│  │  ├─ arrival.ts / keyboard.ts # when the arrival plays; global shortcut mapping
+│  │  ├─ player/                  # track.ts (source resolver), queue.ts, time.ts — pure player logic
 │  │  ├─ seo.ts                   # JSON-LD builders
 │  │  └─ typograf.ts
 │  ├─ stores/                     # nanostores: theme, sound fx, ui (player store lives in components/player)
@@ -110,9 +113,10 @@ next-station footer and transition direction all read from it.
 
 | Island | Directive | Notes |
 |---|---|---|
-| Player | `client:load` + `transition:persist="player"` | In `BaseLayout`; must exist on every page |
+| Player | `client:idle` + `transition:persist="player"` | In `BaseLayout`; must exist on every page. Renders nothing until there is a queue, and PlayButtons drive the shared controller directly, so it hydrates on idle (D-026) |
 | PlayButton (in lists) | `client:visible` | Talks to the player store; tiny |
-| LineMap overlay | `client:idle` | Loaded after idle; opened by button/keyboard |
+| LineMap overlay («Схема») | zero-JS `.astro` `<dialog>` + plain script loaded on idle | Native modal dialog; the script binds the button, `M`, theme and «Звук» (D-026) |
+| TrackOfTheEvening | `client:idle` | Server renders the build-date pick; the island switches to the visitor's date (fetches `/tracks/evening.json` only if needed) |
 | Timeline | `client:visible` | Static SVG/HTML rendered at build; island adds drag/scroll/zoom |
 | SyncedLyrics | `client:visible` | Only on songs with timestamps; lyrics are SSR'd as plain HTML first |
 | Lightbox | `client:idle` | Gallery works as plain links without JS |
@@ -135,7 +139,11 @@ UI islands ──▶│ $volume $soundFx  $lyricsLine              │◀── 
                                                                       └─ persisted state (localStorage): queue, position, volume
 ```
 
-- One `HTMLAudioElement` for the whole session, owned by `audio-engine.ts`, created inside the persisted Player island.
+- One `HTMLAudioElement` for the whole session, owned by `audio-engine.ts` (file backend) in module scope — modules survive
+  ClientRouter navigations, so the element does too. `controller.ts` holds the actions (play a list, toggle, next/previous, seek)
+  shared by the Player, every PlayButton and the keyboard; the persisted Player island is the UI.
+- The track catalog is built at build time (`src/lib/content/catalog.ts`): `src` is set only when `pnpm media` produced the
+  `.m4a`, so a clone without media falls back to SoundCloud or an external link instead of a dead button.
 - `transition:persist` keeps the island (and the audio element) alive across `<ClientRouter />` navigations.
 - **Source resolver** per recording: (1) self-hosted, owner-provided file (primary), (2) SoundCloud Widget API (hidden iframe controlled by
   our UI) if a SoundCloud URL exists, (3) otherwise external link button. See [integrations.md](integrations.md).
@@ -160,6 +168,8 @@ and rebuilt with `pnpm media`. Production location is chosen in phase 9. Never c
 
 ## 7. Styling architecture
 
+- The cascade layer order is declared in an inline `<style>` at the top of `BaseLayout`'s `<head>`: the bundler emits component
+  CSS before `main.css` and drops a bare `@layer a, b;` statement, which would otherwise make `components` the weakest layer (D-026).
 - Global: `tokens.css` (palette, spacing, type scale, motion tokens) → `themes.css` (semantic tokens per `data-theme`) → `global.css` (reset, base) → `typography.css`.
 - Components: Astro scoped `<style>`; Svelte component styles. Use semantic tokens only.
 - Modern CSS welcome: container queries, `:has()`, cascade layers (`@layer reset, tokens, base, components, utilities`), `clamp()`, `color-mix()`,

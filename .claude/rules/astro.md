@@ -11,14 +11,16 @@ paths:
 ## Rendering
 - Site is `output: 'static'`. Every route is pre-rendered; dynamic routes use `getStaticPaths()` fed by content collections.
 - Default to **zero-JS `.astro` components**. Add an island only when the component holds client state or reacts to input.
-- Pick the laziest hydration directive that works: `client:visible` > `client:idle` > `client:load`. `client:load` is reserved for the Player.
+- Pick the laziest hydration directive that works: `client:visible` > `client:idle` > `client:load`. Even the Player hydrates on idle
+  (it renders nothing until there is a queue; PlayButtons call the shared controller directly — D-026).
 - Never `client:only` unless the component truly cannot render on the server (e.g. WebGL canvas) — and then render a static fallback.
 - Pass the minimum serialisable props to islands (ids, small objects). Never pass whole collections or markdown bodies.
 
 ## Layouts and navigation
 - All pages use `BaseLayout.astro` (which includes `<ClientRouter />`, the persisted Player, the line indicator, theme pre-paint script, skip links,
   and the route-change live region). Station pages use `StationLayout.astro` on top of it.
-- The Player is rendered once in `BaseLayout` with `transition:persist="player"`. Do not render players elsewhere.
+- The Player is rendered once in `BaseLayout` with `transition:persist="player"`. Do not render players elsewhere; to play something,
+  render a `PlayButton` (only for playable tracks — otherwise an external link) fed by `src/lib/content/catalog.ts`.
 - Use `transition:name` for shared elements (cover → release hero, photo thumbnail → lightbox). Names must be unique per page: `cover-${release.id}`.
 - Transition direction between stations comes from `src/lib/stations.ts` (index comparison), set via `data-direction` on `<html>` in an
   `astro:before-preparation` listener — not hard-coded per page.

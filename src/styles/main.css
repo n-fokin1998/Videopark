@@ -1,5 +1,8 @@
-/* Global stylesheet entry, imported once by BaseLayout. Order = docs/architecture.md §7. */
-@import './layers.css';
+/*
+ * Global stylesheet entry, imported once by BaseLayout. Order = docs/architecture.md §7.
+ * The cascade layer order (reset, tokens, base, components, utilities) is declared inline at the top of BaseLayout's
+ * <head>: the bundler places component CSS before this file and drops a bare `@layer` statement.
+ */
 @import './fonts.css';
 @import './tokens.css';
 @import './themes.css';

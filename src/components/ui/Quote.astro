@@ -1,0 +1,54 @@
+---
+/**
+ * A pull quote (docs/design.md §5 «Quote»): Literata italic, large, in «ёлочки», attribution in mono small caps.
+ * Quotes are verbatim (editorial-guidelines.md §4) and always in their original language (`lang="ru"`).
+ */
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+import type { Quote } from '~/lib/content/queries';
+
+interface Props {
+  quote: Quote;
+  hidden?: boolean;
+  [key: `data-${string}`]: string | boolean | undefined;
+}
+
+const { quote, hidden = false, ...rest } = Astro.props;
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<figure class="quote" hidden={hidden} {...rest}>
+  <blockquote lang="ru">
+    <p>«{quote.data.text}»</p>
+  </blockquote>
+  <figcaption class="meta">
+    — {t('quote.attribution')}, {quote.data.source.title}
+  </figcaption>
+</figure>
+
+<style>
+  @layer components {
+    .quote {
+      display: grid;
+      gap: var(--space-s);
+      max-inline-size: var(--measure-prose);
+    }
+
+    .quote[hidden] {
+      display: none;
+    }
+
+    blockquote {
+      font-family: var(--font-poem);
+      font-size: var(--fs-quote);
+      font-style: italic;
+      line-height: var(--lh-heading);
+      text-wrap: pretty;
+    }
+
+    figcaption {
+      text-transform: none;
+      letter-spacing: 0.02em;
+    }
+  }
+</style>

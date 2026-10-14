@@ -1,15 +1,30 @@
 ---
 /**
  * The shell of every page (docs/architecture.md §3, §9; .claude/rules/astro.md):
- * <head> + SEO, theme pre-paint script, <ClientRouter />, skip links, the line indicator, the route-change live region.
- * The persisted Player (`transition:persist="player"`) joins here in phase 2 — together with the «К плееру» skip link.
+ * <head> + SEO, the pre-paint script (theme by time of day / pinned theme, arrival flag), <ClientRouter />,
+ * skip links, the header (compact mark, line indicator, «Схема»), the route-change live region and the persisted Player.
+ * Slots: default (inside the content wrap), `hero` (full-bleed, top of <main>), `footer`, `overlay` (outside <main>,
+ * e.g. the arrival).
  */
 import { ClientRouter } from 'astro:transitions';
 import golosCyrillic from '@fontsource-variable/golos-text/files/golos-text-cyrillic-wght-normal.woff2?url';
 import literataCyrillic from '@fontsource-variable/literata/files/literata-cyrillic-wght-normal.woff2?url';
+import CompactMark from '~/components/station/CompactMark.astro';
 import LineIndicator from '~/components/station/LineIndicator.astro';
-import { defaultLocale, isLocale, normalizePath, useTranslations } from '~/i18n';
+import LineMap from '~/components/station/LineMap.astro';
+import Player from '~/components/player/Player.svelte';
+import {
+  defaultLocale,
+  enabledLocales,
+  isLocale,
+  localizedPath,
+  normalizePath,
+  strings,
+  useTranslations,
+} from '~/i18n';
+import { ARRIVAL_STORAGE_KEY } from '~/lib/arrival';
 import { defaultTheme, THEME_STORAGE_KEY, themes } from '~/lib/themes';
+import { darkSchemeTheme, themeSchedule } from '~/lib/time-of-day';
 import type { StationId } from '~/lib/stations';
 import '~/styles/main.css';
 
@@ -22,16 +37,26 @@ interface Props {
   /** Text announced to screen readers after a client-side navigation. Defaults to the title. */
   announce?: string | undefined;
   noindex?: boolean;
+  /** Fonts to preload: only what renders above the fold (the platform needs just the sign face). */
+  preloadFonts?: readonly ('sign' | 'poem')[];
 }
 
 const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
 const t = useTranslations(locale);
-const { title, description = t('site.description'), station, announce, noindex = false } = Astro.props;
+const {
+  title,
+  description = t('site.description'),
+  station,
+  announce,
+  noindex = false,
+  preloadFonts = ['sign', 'poem'],
+} = Astro.props;
 
 const siteName = t('site.name');
 const fullTitle = title ? t('site.titleTemplate', { title }) : siteName;
 // build.format "file" emits music.html, but URLs are extensionless (/music).
 const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
+const platformPaths = enabledLocales.map((l) => localizedPath('/', l));
 ---
 
 <!doctype html>
@@ -39,6 +64,13 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!--
+      Cascade layer order. Declared inline before any stylesheet: the bundler emits component CSS ahead of main.css
+      and drops a bare `@layer a, b;` statement, which would make `components` the weakest layer.
+    -->
+    <style is:inline>
+      @layer reset, tokens, base, components, utilities;
+    </style>
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -54,16 +86,53 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:locale" content={locale} />
 
-    <link rel="preload" href={golosCyrillic} as="font" type="font/woff2" crossorigin />
-    <link rel="preload" href={literataCyrillic} as="font" type="font/woff2" crossorigin />
+    {preloadFonts.includes('sign') && (
+      <link rel="preload" href={golosCyrillic} as="font" type="font/woff2" crossorigin />
+    )}
+    {preloadFonts.includes('poem') && (
+      <link rel="preload" href={literataCyrillic} as="font" type="font/woff2" crossorigin />
+    )}
 
-    <!-- Pre-paint: apply a theme pinned in «Схема» before first paint (no flash). Time-of-day themes come in phase 2. -->
-    <script is:inline define:vars={{ key: THEME_STORAGE_KEY, themes }}>
+    <!--
+      Pre-paint (no flash): the pinned theme, else the time-of-day theme (same table as src/lib/time-of-day.ts);
+      and the arrival flag (same rule as src/lib/arrival.ts). If the arrival script never starts, the overlay is
+      released after 10 s so the page can never stay covered.
+    -->
+    <script
+      is:inline
+      define:vars={{
+        key: THEME_STORAGE_KEY,
+        themes,
+        schedule: themeSchedule,
+        darkMap: darkSchemeTheme,
+        arrivalKey: ARRIVAL_STORAGE_KEY,
+        platformPaths,
+      }}
+    >
       try {
+        const root = document.documentElement;
         const pinned = localStorage.getItem(key);
-        if (pinned && themes.includes(pinned)) document.documentElement.dataset.theme = pinned;
+        let theme = pinned && themes.includes(pinned) ? pinned : null;
+        if (!theme) {
+          const hour = new Date().getHours();
+          theme = 'night';
+          for (const [from, name] of schedule) if (hour >= from) theme = name;
+          if (matchMedia('(prefers-color-scheme: dark)').matches && darkMap[theme]) theme = darkMap[theme];
+        }
+        root.dataset.theme = theme;
+        const path = location.pathname.replace(/\/index\.html$/, '/').replace(/(.)\/$/, '$1');
+        if (
+          platformPaths.includes(path) &&
+          !localStorage.getItem(arrivalKey) &&
+          !matchMedia('(prefers-reduced-motion: reduce)').matches
+        ) {
+          root.dataset.arrival = 'pending';
+          setTimeout(() => {
+            if (!window.__vpArrival) delete root.dataset.arrival;
+          }, 10000);
+        }
       } catch {
-        /* storage unavailable: keep the default theme */
+        /* storage unavailable: keep the default theme, skip the arrival */
       }
     </script>
     <ClientRouter />
@@ -72,10 +141,19 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
     <a class="skip" href="#content">
       {t('a11y.skipToContent')}
     </a>
+    <a class="skip skip--player" href="#player">
+      {t('a11y.skipToPlayer')}
+    </a>
+
+    <slot name="overlay" />
 
     <header class="site-header" transition:name="line" transition:animate="none">
-      <div class="wrap">
+      <div class="wrap site-header__inner">
+        <a class="site-header__home" href={localizedPath('/', locale)} aria-label={siteName}>
+          <CompactMark size={40} decorative />
+        </a>
         <LineIndicator current={station} locale={locale} />
+        <LineMap current={station} locale={locale} />
       </div>
     </header>
 
@@ -86,6 +164,7 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
       transition:animate="none"
       data-announce={announce ?? title ?? siteName}
     >
+      <slot name="hero" />
       <div class="wrap">
         <slot />
       </div>
@@ -105,8 +184,22 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
       transition:persist="announcer"
     ></div>
 
+    <Player
+      client:idle
+      transition:persist="player"
+      labels={strings(locale, 'player')}
+      soundLabel={t('sound.label')}
+      opensInNewTab={t('a11y.opensInNewTab')}
+    />
+
     <script>
       import '~/scripts/navigation';
+      import '~/scripts/theme';
+
+      // «Схема» is not needed for first paint (its button stays hidden until bound): load it when the browser is idle.
+      const loadLineMap = () => void import('~/scripts/line-map');
+      if ('requestIdleCallback' in window) requestIdleCallback(loadLineMap, { timeout: 2000 });
+      else setTimeout(loadLineMap, 200);
     </script>
   </body>
 </html>
@@ -132,10 +225,34 @@ const canonical = new URL(normalizePath(Astro.url.pathname), Astro.site);
       color: var(--bg);
     }
 
+    /* «К плееру» exists only while the player is on screen (Player.svelte sets html[data-player]). */
+    .skip--player {
+      display: none;
+    }
+
+    :global(html[data-player]) .skip--player {
+      display: block;
+    }
+
     .site-header {
       position: relative;
       z-index: var(--z-header);
       padding-block: max(var(--space-s), env(safe-area-inset-top)) var(--space-2xs);
+    }
+
+    .site-header__inner {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      align-items: start;
+      gap: var(--space-2xs);
+    }
+
+    .site-header__home {
+      display: inline-grid;
+      place-items: center;
+      inline-size: var(--hit-target);
+      block-size: var(--hit-target);
+      border-radius: var(--radius-round);
     }
 
     main:focus {

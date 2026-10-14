@@ -21,6 +21,9 @@ export default defineConfig({
     baseURL,
     trace: 'retain-on-failure',
     locale: 'ru-RU',
+    // Every test is a returning visitor unless it opts out (tests/e2e/arrival.spec.ts): the first-visit arrival
+    // overlay would cover the platform.
+    storageState: { cookies: [], origins: [{ origin: baseURL, localStorage: [{ name: 'vp:arrived', value: '1' }] }] },
   },
   webServer: {
     command: process.env.E2E_SKIP_BUILD ? 'pnpm preview' : 'pnpm build && pnpm preview',

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { plural, translate, useTranslations } from './t';
+import { interpolate } from './format';
+import { plural, strings, translate, useTranslations } from './t';
 
 describe('translate', () => {
   it('resolves nested keys', () => {
@@ -46,5 +47,15 @@ describe('plural', () => {
 
   it('falls back to "other" when a form is missing', () => {
     expect(plural('en', 2, { one: 'track', other: 'tracks' })).toBe('tracks');
+  });
+});
+
+describe('strings / interpolate', () => {
+  it('hands islands a namespace and fills placeholders like t()', () => {
+    const player = strings('ru', 'player');
+    expect(interpolate(player.playTrack, { title: 'Вода' })).toBe(
+      translate('ru', 'player.playTrack', { title: 'Вода' }),
+    );
+    expect(interpolate('{a} {b}', { a: 1 })).toBe('1 {b}');
   });
 });

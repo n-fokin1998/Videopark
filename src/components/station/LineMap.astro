@@ -1,0 +1,385 @@
+---
+/**
+ * «Схема» — the line map overlay (docs/information-architecture.md §3.2, docs/design.md §5): the full line with
+ * transfers, the light (time-of-day theme) and «Звук» settings, and the keyboard shortcuts. A native modal <dialog>
+ * (focus trap, inert background, Esc, focus return) — full-screen vertical sheet on phones, a large panel on desktop.
+ * Behaviour (open with the button or `M`, settings) lives in src/scripts/line-map.ts. The button is `hidden` until that
+ * script runs: without JS the line indicator and the next-station footer remain the navigation.
+ * (Search joins here in phase 8.)
+ */
+import { useTranslations, type Locale } from '~/i18n';
+import { themes } from '~/lib/themes';
+import type { StationId } from '~/lib/stations';
+import Icon from '~/components/ui/Icon.astro';
+import LineDiagram from './LineDiagram.astro';
+import Wordmark from './Wordmark.astro';
+
+interface Props {
+  locale: Locale;
+  current?: StationId | undefined;
+}
+
+const { locale, current } = Astro.props;
+const t = useTranslations(locale);
+const themeOptions = ['auto', ...themes] as const;
+---
+
+<button type="button" class="map-open" data-line-map-open hidden aria-haspopup="dialog" aria-keyshortcuts="M">
+  <Icon name="map" />
+  <span class="map-open__text">{t('map.open')}</span>
+</button>
+
+<dialog class="map" data-line-map-dialog aria-labelledby="line-map-title">
+  <div class="map__inner">
+    <header class="map__head">
+      <Wordmark variant="horizontal" class="map__wordmark" />
+      <button type="button" class="map__close" data-line-map-close aria-label={t('map.close')}>
+        <Icon name="close" />
+      </button>
+    </header>
+
+    <h2 id="line-map-title" class="map__title">
+      {t('map.title')}
+    </h2>
+    <LineDiagram locale={locale} current={current} labelledBy="line-map-title" />
+
+    <section class="map__settings" aria-labelledby="line-map-settings">
+      <h3 id="line-map-settings" class="meta">
+        {t('map.settings')}
+      </h3>
+      <fieldset class="map__themes">
+        <legend>{t('theme.legend')}</legend>
+        {themeOptions.map((value) => (
+          <label class="map__theme">
+            <input type="radio" name="theme" value={value} data-theme-choice checked={value === 'auto'} />
+            <span>{t(`theme.${value}`)}</span>
+          </label>
+        ))}
+      </fieldset>
+      <div class="map__sound">
+        <button
+          type="button"
+          class="map__toggle"
+          data-sound-toggle
+          aria-pressed="false"
+          aria-describedby="line-map-sound-note"
+        >
+          <span class="map__toggle-on">
+            <Icon name="soundOn" size={20} />
+          </span>
+          <span class="map__toggle-off">
+            <Icon name="soundOff" size={20} />
+          </span>
+          {t('sound.label')}
+        </button>
+        <p id="line-map-sound-note" class="map__note">
+          {t('sound.note')}
+        </p>
+      </div>
+    </section>
+
+    <section class="map__keys" aria-labelledby="line-map-keys">
+      <h3 id="line-map-keys" class="meta">
+        {t('map.shortcuts')}
+      </h3>
+      <dl>
+        <div>
+          <dt>
+            <kbd>{t('keys.lineMap')}</kbd>
+          </dt>
+          <dd>{t('shortcuts.lineMap')}</dd>
+        </div>
+        <div>
+          <dt>
+            <kbd>{t('keys.close')}</kbd>
+          </dt>
+          <dd>{t('shortcuts.close')}</dd>
+        </div>
+        <div>
+          <dt>
+            <kbd>{t('keys.playPause')}</kbd>
+          </dt>
+          <dd>{t('shortcuts.playPause')}</dd>
+        </div>
+        <div>
+          <dt>
+            <kbd>{t('keys.next')}</kbd> <kbd>{t('keys.previous')}</kbd>
+          </dt>
+          <dd>{t('shortcuts.nextPrevious')}</dd>
+        </div>
+        <div>
+          <dt>
+            <kbd>{t('keys.back')}</kbd> <kbd>{t('keys.forward')}</kbd>
+          </dt>
+          <dd>{t('shortcuts.seek')}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+</dialog>
+
+<style>
+  @layer components {
+    .map-open {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2xs);
+      min-inline-size: var(--hit-target);
+      min-block-size: var(--hit-target);
+      padding-inline: var(--space-xs);
+      border: var(--border-thin) solid var(--border);
+      border-radius: var(--radius-round);
+      background: color-mix(in srgb, var(--bg-raised) 80%, transparent);
+      color: var(--fg);
+      font-size: var(--fs-ui);
+      cursor: pointer;
+    }
+
+    .map-open[hidden] {
+      display: none;
+    }
+
+    .map-open:hover {
+      border-color: var(--line);
+    }
+
+    /* Phones: icon only. */
+    @media (width < 640px) {
+      .map-open__text {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        overflow: hidden;
+        clip-path: inset(50%);
+        white-space: nowrap;
+      }
+
+      .map-open {
+        padding-inline: 0;
+        justify-content: center;
+      }
+    }
+
+    .map {
+      inline-size: 100%;
+      max-inline-size: 100%;
+      block-size: 100dvh;
+      max-block-size: 100dvh;
+      margin: 0;
+      padding: 0;
+      border: 0;
+      background: var(--bg);
+      color: var(--fg);
+      overflow: hidden;
+    }
+
+    .map::backdrop {
+      background: color-mix(in srgb, var(--bg) 75%, transparent);
+      backdrop-filter: blur(6px);
+    }
+
+    .map[open] .map__inner {
+      animation: map-in var(--dur-medium) var(--ease-out);
+    }
+
+    @keyframes map-in {
+      from {
+        opacity: 0;
+        transform: scale(0.98);
+      }
+    }
+
+    .map__inner {
+      display: grid;
+      align-content: start;
+      gap: var(--space-l);
+      block-size: 100%;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding-block: max(var(--space-s), env(safe-area-inset-top)) max(var(--space-xl), env(safe-area-inset-bottom));
+      padding-inline: max(var(--gutter), env(safe-area-inset-left)) max(var(--gutter), env(safe-area-inset-right));
+      background: linear-gradient(to bottom, var(--sky-top), var(--bg) 40%);
+    }
+
+    .map__head {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: var(--space-s);
+    }
+
+    .map__head :global(.map__wordmark) {
+      --wm-size: var(--fs-h2);
+    }
+
+    .map__close {
+      display: inline-grid;
+      place-items: center;
+      inline-size: var(--hit-target);
+      block-size: var(--hit-target);
+      flex: none;
+      border: var(--border-thin) solid var(--border);
+      border-radius: var(--radius-round);
+      background: var(--bg-raised);
+      color: var(--fg);
+      cursor: pointer;
+    }
+
+    .map__title {
+      font-size: var(--fs-h1);
+    }
+
+    .map__settings,
+    .map__keys {
+      display: grid;
+      gap: var(--space-s);
+      padding-block-start: var(--space-m);
+      border-block-start: var(--border-thin) solid var(--border);
+    }
+
+    .map__themes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs);
+      padding: 0;
+      border: 0;
+    }
+
+    .map__themes legend {
+      inline-size: 100%;
+      margin-block-end: var(--space-2xs);
+      font-weight: 600;
+    }
+
+    .map__theme {
+      position: relative;
+      display: inline-flex;
+    }
+
+    .map__theme input {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      margin: 0;
+      cursor: pointer;
+    }
+
+    .map__theme span {
+      display: inline-flex;
+      align-items: center;
+      min-block-size: var(--hit-target);
+      padding-inline: var(--space-s);
+      border: var(--border-thin) solid var(--border);
+      border-radius: var(--radius-round);
+      color: var(--fg-muted);
+    }
+
+    .map__theme input:checked + span {
+      border-color: var(--accent);
+      color: var(--fg);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .map__theme input:focus-visible + span {
+      outline: 2px solid var(--focus);
+      outline-offset: 2px;
+    }
+
+    .map__sound {
+      display: grid;
+      gap: var(--space-2xs);
+      justify-items: start;
+    }
+
+    .map__toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-2xs);
+      min-block-size: var(--hit-target);
+      padding-inline: var(--space-s);
+      border: var(--border-thin) solid var(--border);
+      border-radius: var(--radius-round);
+      background: none;
+      color: var(--fg-muted);
+      cursor: pointer;
+    }
+
+    .map__toggle[aria-pressed='true'] {
+      border-color: var(--accent);
+      color: var(--fg);
+    }
+
+    .map__toggle[aria-pressed='true'] .map__toggle-off,
+    .map__toggle[aria-pressed='false'] .map__toggle-on {
+      display: none;
+    }
+
+    .map__toggle span {
+      display: inline-flex;
+    }
+
+    .map__note {
+      font-size: var(--fs-ui);
+      color: var(--fg-muted);
+      max-inline-size: var(--measure-prose);
+    }
+
+    .map__keys dl {
+      display: grid;
+      gap: var(--space-2xs);
+    }
+
+    .map__keys dl div {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-2xs) var(--space-s);
+      align-items: baseline;
+    }
+
+    .map__keys dt {
+      min-inline-size: 6rem;
+      color: var(--fg);
+    }
+
+    .map__keys dd {
+      color: var(--fg-muted);
+    }
+
+    kbd {
+      display: inline-block;
+      min-inline-size: 1.8em;
+      padding: 0.1em 0.45em;
+      border: var(--border-thin) solid var(--border);
+      border-block-end-width: 2px;
+      border-radius: var(--radius-s);
+      font-family: var(--font-tape);
+      font-size: var(--fs-meta);
+      text-align: center;
+    }
+
+    /* Touch-only devices have no keyboard: hide the shortcuts. */
+    @media (hover: none) and (pointer: coarse) {
+      .map__keys {
+        display: none;
+      }
+    }
+
+    @media (width >= 960px) {
+      .map {
+        inline-size: min(72rem, calc(100% - 2 * var(--gutter)));
+        block-size: fit-content;
+        max-block-size: calc(100dvh - 2 * var(--space-l));
+        margin: auto;
+        border-radius: var(--radius-l);
+        border: var(--border-thin) solid var(--border);
+        box-shadow: 0 var(--space-m) var(--space-2xl) var(--shadow);
+      }
+
+      .map__inner {
+        block-size: auto;
+        max-block-size: inherit;
+        padding: var(--space-l);
+      }
+    }
+  }
+</style>

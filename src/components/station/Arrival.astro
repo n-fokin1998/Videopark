@@ -1,0 +1,227 @@
+---
+/**
+ * The silent arrival (docs/information-architecture.md §5, D-013): a dusk platform, the wordmark lights up like a
+ * station lamp, one button «Войти на станцию» → a train pulls in (its headlight sweeping the platform) and the doors
+ * part, revealing the platform state underneath. Never touches audio.
+ *
+ * Progressive enhancement: the overlay is `hidden` and shows only when the inline pre-paint script set
+ * `html[data-arrival="pending"]` (first visit at «/», JS on, no reduced motion). Without JS, crawlers and link
+ * previews see the server-rendered platform state. Skippable at any point (Esc, «Пропустить»). Behaviour:
+ * src/scripts/arrival.ts. Rendered by the platform page into BaseLayout's `overlay` slot (outside <main>, so the
+ * rest of the page can be made inert while it shows).
+ */
+import { defaultLocale, isLocale, useTranslations } from '~/i18n';
+import PlatformScene from './PlatformScene.astro';
+import Wordmark from './Wordmark.astro';
+
+const locale = isLocale(Astro.currentLocale) ? Astro.currentLocale : defaultLocale;
+const t = useTranslations(locale);
+---
+
+<div class="arrival" data-arrival-overlay hidden role="dialog" aria-modal="true" aria-labelledby="arrival-title">
+  <div class="arrival__scene">
+    <PlatformScene idPrefix="arrival-scene" class="arrival__art" />
+    <div class="arrival__content">
+      <p id="arrival-title" class="visually-hidden">
+        {t('platform.arrivalLabel')}
+      </p>
+      <div aria-hidden="true">
+        <Wordmark variant="stacked" lit class="arrival__wordmark" />
+      </div>
+      <button type="button" class="arrival__enter" data-arrival-enter>
+        {t('platform.enter')}
+      </button>
+    </div>
+    <button type="button" class="arrival__skip" data-arrival-skip>
+      {t('platform.skip')}
+    </button>
+  </div>
+  <div class="arrival__train" aria-hidden="true">
+    <div class="arrival__door arrival__door--left"></div>
+    <div class="arrival__door arrival__door--right"></div>
+  </div>
+</div>
+
+<script>
+  import '~/scripts/arrival';
+</script>
+
+<style>
+  @layer components {
+    :global(html[data-arrival='pending']) {
+      overflow: hidden;
+    }
+
+    .arrival {
+      position: fixed;
+      inset: 0;
+      z-index: var(--z-arrival);
+      display: none;
+      overflow: hidden;
+      transition: opacity var(--dur-short) var(--ease-out);
+    }
+
+    :global(html[data-arrival='pending']) .arrival {
+      display: block;
+    }
+
+    .arrival.is-leaving {
+      opacity: 0;
+    }
+
+    .arrival__scene {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      background: linear-gradient(to bottom, var(--sky-top), var(--sky-bottom));
+    }
+
+    .arrival__scene :global(.arrival__art) {
+      position: absolute;
+      inset: 0;
+    }
+
+    .arrival__content {
+      position: relative;
+      display: grid;
+      align-content: center;
+      justify-items: center;
+      gap: var(--space-xl);
+      padding: max(var(--space-l), env(safe-area-inset-top)) var(--gutter)
+        max(var(--space-2xl), env(safe-area-inset-bottom));
+      /* Sit on the far wall, above the platform edge. */
+      padding-block-end: 30svh;
+    }
+
+    .arrival__content :global(.arrival__wordmark) {
+      --wm-size: clamp(3rem, 1.6rem + 7vw, 7.5rem);
+    }
+
+    .arrival__enter {
+      min-block-size: calc(var(--hit-target) * 1.2);
+      padding-inline: var(--space-l);
+      border: var(--border-thin) solid var(--accent);
+      border-radius: var(--radius-round);
+      background: var(--accent);
+      color: var(--bg);
+      font-size: var(--fs-body);
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 0 var(--space-xl) color-mix(in srgb, var(--accent) 45%, transparent);
+      animation: enter-in var(--dur-slow) var(--ease-out) both;
+      animation-delay: var(--dur-medium);
+    }
+
+    @keyframes enter-in {
+      from {
+        opacity: 0;
+        transform: translateY(var(--space-2xs));
+      }
+    }
+
+    .arrival__skip {
+      position: absolute;
+      inset-block-start: max(var(--space-s), env(safe-area-inset-top));
+      inset-inline-end: max(var(--gutter), env(safe-area-inset-right));
+      min-block-size: var(--hit-target);
+      padding-inline: var(--space-s);
+      border: 0;
+      border-radius: var(--radius-round);
+      background: color-mix(in srgb, var(--bg) 60%, transparent);
+      color: var(--fg);
+      font-size: var(--fs-ui);
+      text-decoration: underline;
+      text-underline-offset: 0.2em;
+      cursor: pointer;
+    }
+
+    /* ── The train ─────────────────────────────────────────────── */
+
+    .arrival__train {
+      position: absolute;
+      inset: 0;
+      transform: translateX(115%);
+      transition: transform var(--dur-arrival-train) var(--ease-out);
+      pointer-events: none;
+    }
+
+    /* The headlight sweeps along the platform ahead of the train. */
+    .arrival__train::before {
+      content: '';
+      position: absolute;
+      inset-block: 20% 15%;
+      inset-inline-start: -60%;
+      inline-size: 70%;
+      background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 45%, transparent), transparent);
+      opacity: 0;
+      transition: opacity var(--dur-arrival-train) var(--ease-out);
+    }
+
+    .is-arriving .arrival__train {
+      transform: none;
+    }
+
+    .is-arriving .arrival__train::before {
+      opacity: 1;
+    }
+
+    .is-open .arrival__train::before {
+      opacity: 0;
+    }
+
+    .arrival__door {
+      position: absolute;
+      inset-block: 0;
+      inline-size: 50.5%;
+      background:
+        linear-gradient(to bottom, transparent 64%, var(--line) 64%, var(--line) 66.5%, transparent 66.5%),
+        linear-gradient(
+          to bottom,
+          color-mix(in srgb, var(--sky-top) 55%, var(--bg-raised)),
+          var(--bg-raised) 70%,
+          var(--bg)
+        );
+      transition: transform var(--dur-arrival-doors) var(--ease-in-out);
+    }
+
+    /* A lit window in each door half. */
+    .arrival__door::before {
+      content: '';
+      position: absolute;
+      inset-block: 16% 46%;
+      inset-inline: 22%;
+      border-radius: var(--radius-l);
+      background: color-mix(in srgb, var(--accent) 30%, var(--bg));
+      box-shadow:
+        inset 0 0 var(--space-xl) color-mix(in srgb, var(--accent) 45%, transparent),
+        0 0 var(--space-l) color-mix(in srgb, var(--accent) 20%, transparent);
+    }
+
+    .arrival__door--left {
+      inset-inline-start: 0;
+      border-inline-end: var(--line-stroke) solid var(--border);
+    }
+
+    .arrival__door--right {
+      inset-inline-end: 0;
+    }
+
+    .is-open .arrival__scene {
+      visibility: hidden;
+    }
+
+    .is-open .arrival__door--left {
+      transform: translateX(-102%);
+    }
+
+    .is-open .arrival__door--right {
+      transform: translateX(102%);
+    }
+
+    @media (forced-colors: active) {
+      .arrival__enter {
+        border-color: ButtonText;
+      }
+    }
+  }
+</style>
